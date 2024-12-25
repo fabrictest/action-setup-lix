@@ -1,0 +1,31 @@
+---
+name: CI
+on:
+  merge_group:
+  push:
+    branches-ignore:
+      - main
+      - gh-readonly-queue/main/**
+    tags-ignore:
+      - "**"
+  schedule:
+    - cron: 33 01 * * *
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yaml
+    permissions:
+      id-token: write
+  test:
+    needs:
+      - build
+    name: Test
+    uses: ./.github/workflows/test.yaml
+    with:
+      support-matrix: ${{ needs.build.outputs.support-matrix }}
+    secrets:
+      CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      CACHIX_NAME: ${{ secrets.CACHIX_NAME }}
