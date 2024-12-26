@@ -11,7 +11,7 @@ jobs:
       fail-fast: true
       matrix:
         runs-on:
-          - macos-13 # X64
+          - macos-14 # X64
           - macos-15 # ARM64
           - ubuntu-24.04
     name: Lix stores
