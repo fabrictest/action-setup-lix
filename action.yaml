@@ -148,9 +148,9 @@ runs:
         printf '::group::Install Lix\n'
         CDPATH='' cd "$(readlink /nix/var/action-setup-lix/lix)"
         ./bin/nix-store --load-db </nix/var/action-setup-lix/registration
-        MANPATH='' . ./etc/profile.d/nix.sh ${{ runner.debug && '' || '>/dev/null' }}
+        MANPATH='' . ./etc/profile.d/nix.sh
         : "${NIX_SSL_CERT_FILE:=$(test ! -e /etc/ssl/cert.pem || printf /etc/ssl/cert.pem)}"
-        ./bin/nix-env --install "$PWD"
+        ./bin/nix-env --install "$PWD" ${{ runner.debug && '' || '>/dev/null' }}
         printf %s/.nix-profile/bin\\n "$HOME" >>"$GITHUB_PATH"
         ${{ runner.debug && 'tee -a' || 'cat >>' }} "$GITHUB_ENV" <<EOF
         NIX_PROFILES=/nix/var/nix/profiles/default $HOME/.nix-profile
