@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Install Lix
-        uses: fabrictest/action-lix-quick-install@a26983acff7d1282354fdf48f1e4dcb883bfb85e # v7.3.0
+        uses: fabrictest/action-setup-lix@def519a74f4b43c127a41d8d5eb28323ab485710 # v7.3.0
       - name: Print Lix version
         run: |
           nix-build -v --version
