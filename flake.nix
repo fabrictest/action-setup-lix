@@ -1,5 +1,5 @@
 {
-  description = "Install Lix on GitHub Actions faster than you can refresh your browser[1]";
+  description = "Install Lix on GitHub Actions faster than you can refresh your browser";
 
   outputs =
     inputs@{
