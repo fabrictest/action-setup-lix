@@ -26,4 +26,4 @@ jobs:
       support-matrix: ${{ needs.build.outputs.support-matrix }}
     secrets:
       CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      CACHIX_NAME: ${{ secrets.CACHIX_NAME }}
+      CACHIX_NAME: ${{ vars.CACHIX_NAME }}

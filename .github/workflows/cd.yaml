@@ -22,5 +22,5 @@ jobs:
       attestations: write
       id-token: write
     secrets:
-      CICD_APP_ID: ${{ secrets.CICD_APP_ID }}
+      CICD_APP_ID: ${{ vars.CICD_APP_ID }}
       CICD_PRIVATE_KEY: ${{ secrets.CICD_PRIVATE_KEY }}
