@@ -90,8 +90,8 @@ runs:
           printf "::error::failed to set up Lix: apfs.util couldn't symlink /run\n"
           exit 1
         }
-        root_disk=$(stat -f %Sd /)
-        sudo diskutil apfs addVolume "${root_disk%s*}" APFS nix -mountpoint /nix
+        root_device=$(stat -f %Sd /)
+        sudo diskutil apfs addVolume "${root_device%s*}" APFS nix -mountpoint /nix
         sudo mdutil -i off /nix
         sudo chown "$USER" /nix
         printf '::endgroup::\n'
@@ -122,7 +122,7 @@ runs:
               ''
         }}
         lix_store_file="${lix_store_url#${{ startsWith(inputs.lix-store-base-url, 'file://') && '*:/' || '#*' }}/}"
-        gh attestation verify "$lix_store_file" --repo "$GITHUB_ACTION_REPOSITORY" --signer-repo "$GITHUB_ACTION_REPOSITORY"
+        gh attestation verify "$lix_store_file" --owner "${GITHUB_ACTION_REPOSITORY%/*}" --signer-repo "$GITHUB_ACTION_REPOSITORY"
         ${{ runner.os == 'macOS' && 'g' || '' }}tar --auto-compress --extract --skip-old-files --directory=/nix --strip-components=1 "$lix_store_file"
         ${{
           !startsWith(inputs.lix-store-base-url, 'file://') &&
