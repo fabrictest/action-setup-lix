@@ -37,6 +37,7 @@ jobs:
         with:
           name: lix-stores-${{ runner.os }}-${{ runner.arch }}
           path: result/lix-*.tar.*
+          retention-days: ${{ github.ref_name == github.event.repository.default_branch && 1 || null }}
       - name: Generate file specifying which Lix versions were built for this platform
         shell: bash
         env:
