@@ -17,6 +17,7 @@ jobs:
     name: Lix stores
     runs-on: ${{ matrix.runs-on }}
     permissions:
+      attestations: write
       id-token: write
     steps:
       - name: Bootstrap Lix

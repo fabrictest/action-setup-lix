@@ -18,7 +18,6 @@ jobs:
   action:
     name: Action
     permissions:
-      attestations: write
       id-token: write
     runs-on: ubuntu-24.04
     outputs:

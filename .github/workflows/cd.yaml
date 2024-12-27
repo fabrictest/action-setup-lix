@@ -12,6 +12,7 @@ jobs:
     name: Build
     uses: ./.github/workflows/build.yaml
     permissions:
+      attestations: write
       id-token: write
   publish:
     needs:
@@ -19,7 +20,6 @@ jobs:
     name: Publish
     uses: ./.github/workflows/publish.yaml
     permissions:
-      attestations: write
       id-token: write
     secrets:
       CICD_APP_ID: ${{ vars.CICD_APP_ID }}
