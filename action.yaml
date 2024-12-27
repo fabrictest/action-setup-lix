@@ -114,6 +114,7 @@ runs:
           }}
       run: |
         :
+        set -x
         printf '::group::Install Lix store\n'
         rm -rf /nix/var/action-setup-lix
         ${{
