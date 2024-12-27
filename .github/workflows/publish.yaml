@@ -5,7 +5,7 @@ on:
     outputs:
       tag:
         description: |
-          The name of the released tag, or `''` if there was no release.
+          The release tag, or `''` if there was no release.
 
           Example: `v1.2.3`.
         value: ${{ jobs.action.outputs.tag }}
@@ -71,26 +71,27 @@ jobs:
           git push --force --tags
       - name: Download Lix stores
         if: ${{ steps.release.outputs.release_created }}
+        id: lix-stores
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
-          path: .
           pattern: lix-stores-*
           merge-multiple: true
-      - name: Attest action and Lix stores
-        if: ${{ steps.release.outputs.release_created }}
-        uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
-        with:
-          subject-path: |
-            action.yaml
-            lix-*.tar.*
+      - name: Verify Lix store attestations
+        if: ${{ steps.lix-stores.outputs.download-path }}
+        shell: bash
+        env:
+          lix_stores_path: ${{ steps.lix-stores.outputs.download-path }}
+        run: |
+          find -L "$lix_stores_path" -type f -name 'lix-*.tar.*' -exec gh attestation verify {} --repo "$GITHUB_REPOSITORY" --signer-repo "$GITHUB_REPOSITORY" \;
       - name: Attach Lix stores to the GitHub release
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.lix-stores.outputs.download-path }}
         shell: bash
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          lix_stores_path: ${{ steps.lix-stores.outputs.download-path }}
           tag: ${{ steps.release.outputs.tag_name }}
         run: |
-          gh release upload "$tag" lix-*.tar.*
+          find -L "$lix_stores_path" -type f -name 'lix-*.tar.*' -exec gh release upload "$tag" {} +
       - name: Mark release PR as published
         if: ${{ steps.release.outputs.release_created }}
         shell: bash
