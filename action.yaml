@@ -98,6 +98,7 @@ runs:
     - name: Install Lix store
       shell: bash
       env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
         lix_store_url: >-
           ${{
             format('{0}/lix-{1}-{2}-{3}.tar.zstd',
