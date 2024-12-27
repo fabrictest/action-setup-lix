@@ -50,6 +50,7 @@ runs:
         LIX_DEFAULT_VERSION: 2.91.1
       run: |
         :
+        set -x
         printf '::group::Preflight checks\n'
         test ! -e /nix -o -w /nix || {
           printf "::error::failed to set up Lix: /nix exists but isn't writable\n"
@@ -67,6 +68,7 @@ runs:
       shell: bash
       run: |
         :
+        set -x
         printf '::group::Mount `/nix` directory\n'
         sudo install -d -o "$USER" /nix
         ${{
@@ -80,6 +82,7 @@ runs:
       shell: bash
       run: |
         :
+        set -x
         printf '::group::Mount `/nix` directory\n'
         sudo tee -a /etc/synthetic.conf <<"EOF"
         nix
@@ -138,6 +141,7 @@ runs:
         nix_conf: ${{ inputs.nix-conf }}
       run: |
         :
+        set -x
         printf '::group::Synthesize `nix.conf`\n'
         : "${XDG_CONFIG_HOME:=$HOME/.config}"
         mkdir -p "$XDG_CONFIG_HOME/nix/$GITHUB_REPOSITORY_ID"
