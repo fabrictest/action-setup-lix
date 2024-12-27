@@ -154,6 +154,7 @@ runs:
       shell: bash
       run: |
         :
+        set -x
         printf '::group::Install Lix\n'
         CDPATH='' cd "$(readlink /nix/var/action-setup-lix/lix)"
         ./bin/nix-store --load-db </nix/var/action-setup-lix/registration
