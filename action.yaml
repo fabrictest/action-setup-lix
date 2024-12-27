@@ -127,7 +127,7 @@ runs:
         }}
         lix_store_file="${lix_store_url#${{ startsWith(inputs.lix-store-base-url, 'file://') && '*:/' || '#*' }}/}"
         gh attestation verify "$lix_store_file" --{,signer-}repo="${GITHUB_ACTION_REPOSITORY:-$GITHUB_REPOSITORY}"
-        ${{ runner.os == 'macOS' && 'g' || '' }}tar --auto-compress --extract --skip-old-files --directory=/nix --strip-components=1 "$lix_store_file"
+        ${{ runner.os == 'macOS' && 'g' || '' }}tar --auto-compress --extract --skip-old-files --directory=/nix --strip-components=1 <"$lix_store_file"
         ${{
           !startsWith(inputs.lix-store-base-url, 'file://') &&
               'rm -rf "$lix_store_file"' ||
