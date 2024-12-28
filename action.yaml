@@ -44,9 +44,14 @@ runs:
     - name: Do preflight checks
       id: checks
       shell: bash
+      env:
+        LIX_VERSION: ${{ inputs.lix-version }}
+        # renovate: datasource=github-tags depName=lix-project/lix
+        LIX_DEFAULT_VERSION: 2.91.1
       run: |
         :
         printf '::group::Preflight checks\n'
+        ${{ runner.debug && 'set -x' || '' }}
         test ! -e /nix -o -w /nix || {
           printf "::error::failed to set up Lix: /nix exists but isn't writable\n"
           exit 1
@@ -58,16 +63,13 @@ runs:
         lix-version=${LIX_VERSION:-$LIX_DEFAULT_VERSION}
         EOF
         printf '::endgroup::\n'
-      env:
-        LIX_VERSION: ${{ inputs.lix-version }}
-        # renovate: datasource=github-tags depName=lix-project/lix
-        LIX_DEFAULT_VERSION: 2.91.1
     - name: Mount `/nix` directory (Linux)
       if: ${{ steps.checks.outputs.install-nix-dir && runner.os == 'Linux' }}
       shell: bash
       run: |
         :
         printf '::group::Mount `/nix` directory\n'
+        ${{ runner.debug && 'set -x' || '' }}
         sudo install -d -o "$USER" /nix
         ${{
           inputs.lix-on-tmpfs &&
@@ -81,6 +83,7 @@ runs:
       run: |
         :
         printf '::group::Mount `/nix` directory\n'
+        ${{ runner.debug && 'set -x' || '' }}
         sudo tee -a /etc/synthetic.conf <<"EOF"
         nix
         run	private/var/run
@@ -90,25 +93,16 @@ runs:
           printf "::error::failed to set up Lix: apfs.util couldn't symlink /run\n"
           exit 1
         }
-        root_disk=$(stat -f %Sd /)
-        sudo diskutil apfs addVolume "${root_disk%s*}" APFS nix -mountpoint /nix
+        root_device=$(stat -f %Sd /)
+        sudo diskutil apfs addVolume "${root_device%s*}" APFS nix -mountpoint /nix
         sudo mdutil -i off /nix
         sudo chown "$USER" /nix
         printf '::endgroup::\n'
     - name: Install Lix store
       shell: bash
-      run: |
-        :
-        printf '::group::Install Lix store\n'
-        rm -rf /nix/var/action-setup-lix
-        ${{
-          startsWith(inputs.lix-store-base-url, 'file://') &&
-              '<"${lix_archive_url#*://}"' ||
-              'curl --fail --location --retry-connrefused --silent --show-error --retry 3 "$lix_archive_url" |'
-        }} ${{ runner.os == 'macOS' && 'gtar' || 'tar' }} --auto-compress --extract --skip-old-files --directory=/nix --strip-components=1
-        printf '::endgroup::\n'
       env:
-        lix_archive_url: >-
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        lix_store_url: >-
           ${{
             format('{0}/lix-{1}-{2}-{3}.tar.zstd',
                 inputs.lix-store-base-url || format('{0}/{1}/releases/download/v{2}',
@@ -121,11 +115,34 @@ runs:
                 (runner.os == 'Linux' && 'linux') || (runner.os == 'macOS' && 'darwin') || runner.os
             )
           }}
+      run: |
+        :
+        printf '::group::Install Lix store\n'
+        ${{ runner.debug && 'set -x' || '' }}
+        rm -rf /nix/var/action-setup-lix
+        ${{
+          !startsWith(inputs.lix-store-base-url, 'file://') &&
+              'curl --fail --location --remote-name --retry-connrefused --silent --show-error --retry 3 "$lix_store_url"' ||
+              ''
+        }}
+        lix_store_file="${lix_store_url#${{ startsWith(inputs.lix-store-base-url, 'file://') && '*:/' || '#*' }}/}"
+        gh attestation verify "$lix_store_file" --{,signer-}repo="${GITHUB_ACTION_REPOSITORY:-$GITHUB_REPOSITORY}"
+        ${{ runner.os == 'macOS' && 'g' || '' }}tar --auto-compress --extract --skip-old-files --directory=/nix --strip-components=1 <"$lix_store_file"
+        ${{
+          !startsWith(inputs.lix-store-base-url, 'file://') &&
+              'rm -rf "$lix_store_file"' ||
+              ''
+        }}
+        printf '::endgroup::\n'
     - name: Synthesize `nix.conf`
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        nix_conf: ${{ inputs.nix-conf }}
       run: |
         :
         printf '::group::Synthesize `nix.conf`\n'
+        ${{ runner.debug && 'set -x' || '' }}
         : "${XDG_CONFIG_HOME:=$HOME/.config}"
         mkdir -p "$XDG_CONFIG_HOME/nix/$GITHUB_REPOSITORY_ID"
         tee "$XDG_CONFIG_HOME/nix/nix.conf" <<EOF
@@ -138,14 +155,12 @@ runs:
         $nix_conf
         EOF
         printf '::endgroup::\n'
-      env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
-        nix_conf: ${{ inputs.nix-conf }}
     - name: Install Lix
       shell: bash
       run: |
         :
         printf '::group::Install Lix\n'
+        ${{ runner.debug && 'set -x' || '' }}
         CDPATH='' cd "$(readlink /nix/var/action-setup-lix/lix)"
         ./bin/nix-store --load-db </nix/var/action-setup-lix/registration
         MANPATH='' . ./etc/profile.d/nix.sh
