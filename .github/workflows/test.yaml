@@ -3,10 +3,6 @@ name: Test
 on:
   workflow_call:
     inputs:
-      cachix-name:
-        description: The name of the Cachix cache to use as test probe.
-        type: string
-        required: true
       support-matrix:
         type: string
         required: true
@@ -40,7 +36,7 @@ jobs:
         uses: cachix/cachix-action@ad2ddac53f961de1989924296a1f236fcfbaa4fc # v15
         with:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          name: ${{ inputs.cachix-name }}
+          name: ${{ vars.CACHIX_NAME }}
           skipPush: true
       - name: Verify that Lix was installed
         shell: bash
@@ -58,8 +54,7 @@ jobs:
         if: ${{ github.repository_owner == 'fabrictest' }}
         shell: bash
         env:
-          cache: ${{ inputs.cachix-name }}
+          cache: ${{ vars.CACHIX_NAME }}
           probe: ${{ steps.nix-store-add.outputs.probe }}
         run: |
           cachix push "$cache" "$probe"
-        # FIXME(ttlgcc): Test FlakeHub uploads too.
