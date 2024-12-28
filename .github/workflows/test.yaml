@@ -3,17 +3,16 @@ name: Test
 on:
   workflow_call:
     inputs:
+      cachix-name:
+        description: The name of the Cachix cache to use as test probe.
+        type: string
+        required: true
       support-matrix:
         type: string
         required: true
     secrets:
       CACHIX_AUTH_TOKEN:
-        description: |
-          The token with which to authenticate to Cachix.
-        required: true
-      CACHIX_NAME:
-        description: |
-          The name of the Cachix cache to use as test probe.
+        description: The token with which to authenticate to Cachix.
         required: true
 jobs:
   lix-on-runner:
@@ -41,7 +40,7 @@ jobs:
         uses: cachix/cachix-action@ad2ddac53f961de1989924296a1f236fcfbaa4fc # v15
         with:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          name: ${{ secrets.CACHIX_NAME }}
+          name: ${{ inputs.cachix-name }}
           skipPush: true
       - name: Verify that Lix was installed
         shell: bash
@@ -59,7 +58,7 @@ jobs:
         if: ${{ github.repository_owner == 'fabrictest' }}
         shell: bash
         env:
-          cache: ${{ secrets.CACHIX_NAME }}
+          cache: ${{ inputs.cachix-name }}
           probe: ${{ steps.nix-store-add.outputs.probe }}
         run: |
           cachix push "$cache" "$probe"
