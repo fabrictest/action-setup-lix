@@ -1,12 +1,12 @@
 ---
-name: Sync tags
+name: Tags
 on:
   push:
     tags:
       - v?[0-9]+.[0-9]+.[0-9]+
 jobs:
   update-tags:
-    name: v<major> and v<major>.<minor>
+    name: Sync v<major> and v<major>.<minor>
     runs-on: ubuntu-24.04
     steps:
       - name: Generate app token
