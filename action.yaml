@@ -45,7 +45,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         # renovate: datasource=github-tags depName=lix-project/lix
-        LIX_DEFAULT_VERSION: 2.91.0
+        LIX_DEFAULT_VERSION: 2.91.1
         lix_version: ${{ inputs.lix-version }}
         lix_on_tmpfs: ${{ inputs.lix-on-tmpfs && 'true' || 'false' }}
         lix_store_base_url: ${{ inputs.lix-store-base-url }}
