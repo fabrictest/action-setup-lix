@@ -79,18 +79,18 @@ jobs:
         if: ${{ steps.lix-stores.outputs.download-path }}
         shell: bash
         env:
-          lix_stores_path: ${{ steps.lix-stores.outputs.download-path }}
+          download_path: ${{ steps.lix-stores.outputs.download-path }}
         run: |
-          find -L "$lix_stores_path" -type f -name 'lix-*.tar.*' -exec gh attestation verify {} --{,signer-}repo="$GITHUB_REPOSITORY" \;
+          find -L "$download_path" -type f -name 'lix-*.tar.*' -exec gh attestation verify {} --{,signer-}repo="$GITHUB_REPOSITORY" \;
       - name: Attach Lix stores to the GitHub release
         if: ${{ steps.lix-stores.outputs.download-path }}
         shell: bash
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          lix_stores_path: ${{ steps.lix-stores.outputs.download-path }}
+          download_path: ${{ steps.lix-stores.outputs.download-path }}
           tag: ${{ steps.release.outputs.tag_name }}
         run: |
-          find -L "$lix_stores_path" -type f -name 'lix-*.tar.*' -exec gh release upload "$tag" {} +
+          find -L "$download_path" -type f -name 'lix-*.tar.*' -exec gh release upload "$tag" {} +
       - name: Mark release PR as published
         if: ${{ steps.release.outputs.release_created }}
         shell: bash
