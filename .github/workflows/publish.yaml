@@ -81,7 +81,7 @@ jobs:
         env:
           lix_stores_path: ${{ steps.lix-stores.outputs.download-path }}
         run: |
-          find -L "$lix_stores_path" -type f -name 'lix-*.tar.*' -exec gh attestation verify {} --repo "$GITHUB_REPOSITORY" --signer-repo "$GITHUB_REPOSITORY" \;
+          find -L "$lix_stores_path" -type f -name 'lix-*.tar.*' -exec gh attestation verify {} --{,signer-}repo="$GITHUB_REPOSITORY" \;
       - name: Attach Lix stores to the GitHub release
         if: ${{ steps.lix-stores.outputs.download-path }}
         shell: bash
