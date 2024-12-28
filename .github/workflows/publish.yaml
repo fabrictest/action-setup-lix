@@ -36,9 +36,9 @@ jobs:
           manifest-file: .github/release-please-manifest.json
           target-branch: ${{ github.ref_name }}
   lix-stores:
-    name: Lix stores
     needs:
       - action
+    name: Lix stores
     if: ${{ needs.action.outputs.released }}
     runs-on: ubuntu-24.04
     steps:
