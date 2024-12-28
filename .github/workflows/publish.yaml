@@ -68,7 +68,7 @@ jobs:
           download_path: ${{ steps.lix-stores.outputs.download-path }}
           tag: ${{ needs.action.outputs.tag }}
         run: |
-          find -L "$download_path" -type f -name 'lix-*.tar.*' -exec gh release upload "$tag" {} +
+          find -L "$download_path" -type f -name 'lix-*.tar.*' -exec gh release upload "$tag" {} --repo="$GITHUB_REPOSITORY" +
   pr:
     name: PR
     needs:
@@ -83,15 +83,11 @@ jobs:
         with:
           app-id: ${{ vars.CICD_APP_ID }}
           private-key: ${{ secrets.CICD_PRIVATE_KEY }}
-      - name: Check out repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          token: ${{ steps.app-token.outputs.token }}
       - name: Mark release PR as published
         shell: bash
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           commit: ${{ needs.action.outputs.sha }}
         run: |-
-          gh pr list --search "$commit"' is:merged label:"autorelease: tagged" sort:created-desc' --limit 1 --json number --jq '.[0].number' |
-              xargs -I {} -- gh pr edit {} --add-label 'autorelease: published' --remove-label 'autorelease: tagged'
+          gh pr list --repo="$GITHUB_REPOSITORY" --search="$commit"' is:merged label:"autorelease: tagged" sort:created-desc' --limit 1 --json number --jq '.[0].number' |
+              xargs -I{} -- gh pr edit {} --add-label='autorelease: published' --remove-label='autorelease: tagged' --repo="$GITHUB_REPOSITORY"
