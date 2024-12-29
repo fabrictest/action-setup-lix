@@ -9,7 +9,7 @@ on:
           for use as input for `strategy.matrix`.
 
           Format: `{"build": [{"lix-version": "<version>", "runs-on": "<os>"}, ...]}`
-        value: ${{ jobs.matrix.outputs.json }}
+        value: ${{ jobs.matrix.outputs.build-matrix }}
 jobs:
   lix-stores:
     strategy:
@@ -84,7 +84,7 @@ jobs:
           download_path: ${{ steps.build-files.outputs.download-path }}
         run: |
           {
-            echo json'<<'JSON
-            cat "$download_path"/*.jsonl | jq --compact-output --slurp {build:.}
+            echo build-matrix'<<'JSON
+            cat "$download_path"/*.jsonl | jq --slurp {build:.}
             echo JSON
           } | tee -a "$GITHUB_OUTPUT"
