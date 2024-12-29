@@ -20,5 +20,7 @@ jobs:
     name: Publish
     uses: ./.github/workflows/publish.yaml
     permissions:
-      id-token: write
+      actions: read
+      contents: write
+      pull-requests: write
     secrets: inherit
