@@ -25,7 +25,7 @@ jobs:
                 --raw-field tag="$tag" \
                 --raw-field message="Release $tag → $GITHUB_REF_NAME" \
                 --raw-field object="$commit" \
-                --raw-field type=commit
+                --raw-field type=commit \
                 --template 'sha={{.sha}}' |
               xargs -- gh api repos/{owner}/{repo}/git/refs \
                 --raw-field ref=refs/tags/"$tag" \
