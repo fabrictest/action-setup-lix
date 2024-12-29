@@ -56,5 +56,5 @@ jobs:
         env:
           cache: ${{ vars.CACHIX_NAME }}
           probe: ${{ steps.nix-store-add.outputs.probe }}
-        run: |
+        run: |-
           cachix push "$cache" "$probe"

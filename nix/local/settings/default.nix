@@ -1,7 +1,6 @@
 { inputs, cell }:
 let
-  l = pkgs.lib // builtins;
-
+  inherit (inputs) l;
   inherit (inputs.std) lib std;
   inherit (cell) pkgs;
 in
