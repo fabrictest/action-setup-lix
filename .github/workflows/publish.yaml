@@ -5,7 +5,7 @@ on:
     secrets:
       RELEASE_PLEASE_PRIVATE_KEY:
         description: |
-          Private key of the GitHub app responsible for CICD tasks.
+          Private key of the GitHub app used with the release-please action.
         required: true
 jobs:
   release:
