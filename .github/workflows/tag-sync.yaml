@@ -1,0 +1,35 @@
+---
+name: Tag sync
+on:
+  push:
+    tags:
+      - v?[0-9]+.[0-9]+.[0-9]+
+jobs:
+  major-and-minor:
+    name: v<major> and v<major>.<minor>
+    if: ${{ github.event.created }}
+    runs-on: ubuntu-24.04
+    permissions:
+      content: write
+    steps:
+      - name: Tag major and minor versions
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          commit: ${{ github.event.after }}
+        run: |
+          set -x
+          tag_full="$GITHUB_REF_NAME"
+          for tag_short in "${tag_full%.*}" "${tag_full%%.*}"; do
+            gh api repos/{owner}/{repo}/git/tags \
+                --raw-field tag="$tag_short" \
+                --raw-field message="Release $tag_short → $tag_full" \
+                --raw-field object="$commit" \
+                --raw-field type=commit
+                --template 'sha={{.sha}}' |
+              xargs -- gh api repos/{owner}/{repo}/git/refs \
+                --raw-field ref=refs/tags/"$tag" \
+                --raw-field |
+              jq .
+          done
