@@ -87,56 +87,67 @@ quickly need to compare the behavior between different Lix versions.
 Build a specific version of Lix like this (requires you to use a version of Lix
 that supports flakes):
 
-```console
-$ nix build github:fabrictest/action-lix-quick-install#lix-2_91_1
-$ ./result/bin/nix --version
+```$
+nix build github:fabrictest/action-setup-lix#lix-2_91_1 >/dev/null
+./result/bin/nix --quiet --version
+```
+
+```
 nix (Lix, like Nix) 2.91.1
 ```
 
 With `nix shell -c` you can also directly run Nix like this:
 
-```console
-$ nix shell github:fabrictest/action-lix-quick-install#lix-2_91_1 -c nix --version
+```$
+nix shell github:fabrictest/action-setup-lix#lix-2_91_1 -c nix --quiet --version
+```
+
+```
 nix (Lix, like Nix) 2.91.1
 ```
 
 List all available Lix versions like this:
 
-```console
-$ nix flake show --all-systems github:fabrictest/action-lix-quick-install/v1
-github:fabrictest/action-lix-quick-install/25aff27c252e0c8cdda3264805f7b6bcd92c8718?narHash=sha256-th0CV5CoVJm1GYjr7dk%2BebG/3pQp//vqndKWeo/yreY%3D
-git+file:///Users/ttlgcc/fabrictest/action-lix-quick-install
-├───apps
+```$
+nix flake show --all-systems github:fabrictest/action-setup-lix/v0.2.0
+```
+
+```
+github:fabrictest/action-setup-lix/39b3f0cad45d2ca812835c3d861f6d7e1746bc22
+├───__functor: unknown
+├───__std: unknown
+├───aarch64-darwin: unknown
+├───aarch64-linux: unknown
+├───devShells
 │   ├───aarch64-darwin
-│   │   └───release: app
+│   │   └───default: development environment 'action-setup-lix'
+│   ├───aarch64-linux
+│   │   └───default: development environment 'action-setup-lix'
 │   ├───x86_64-darwin
-│   │   └───release: app
+│   │   └───default: development environment 'action-setup-lix'
 │   └───x86_64-linux
-│       └───release: app
-├───defaultApp
-│   ├───aarch64-darwin: app
-│   ├───x86_64-darwin: app
-│   └───x86_64-linux: app
+│       └───default: development environment 'action-setup-lix'
 ├───overlays
-│   ├───aarch64-darwin: Nixpkgs overlay
-│   ├───x86_64-darwin: Nixpkgs overlay
-│   └───x86_64-linux: Nixpkgs overlay
-└───packages
-    ├───aarch64-darwin
-    │   ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
-    │   ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
-    │   ├───lix-archives: package 'lix-archives'
-    │   └───release: package 'release'
-    ├───x86_64-darwin
-    │   ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
-    │   ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
-    │   ├───lix-archives: package 'lix-archives'
-    │   └───release: package 'release'
-    └───x86_64-linux
-        ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
-        ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
-        ├───lix-archives: package 'lix-archives'
-        └───release: package 'release'
+│   └───lixPackages: Nixpkgs overlay
+├───packages
+│   ├───aarch64-darwin
+│   │   ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
+│   │   ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
+│   │   └───lix-stores: package 'lix-stores'
+│   ├───aarch64-linux
+│   │   ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
+│   │   ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
+│   │   └───lix-stores: package 'lix-stores'
+│   ├───x86_64-darwin
+│   │   ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
+│   │   ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
+│   │   └───lix-stores: package 'lix-stores'
+│   └───x86_64-linux
+│       ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
+│       ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
+│       └───lix-stores: package 'lix-stores'
+├───x86_64-darwin: unknown
+└───x86_64-linux: unknown
 ```
 
 If you want to make sure that the version of Lix you're trying to build hasn't
