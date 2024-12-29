@@ -54,8 +54,8 @@ jobs:
           runs_on: ${{ matrix.runs-on }}
         run: |
           printf %s\\n result/lix-*.tar.* |
-              cut -d - -f 2 |
-              jq --compact-output --raw-input --arg runs-on "$runs_on" '{"lix-version": .} + $ARGS.named' >build-"$runs_on".jsonl
+            cut -d - -f 2 |
+            jq --compact-output --raw-input --arg runs-on "$runs_on" '{"lix-version": .} + $ARGS.named' >build-"$runs_on".jsonl
       - name: Upload build description file to GitHub
         uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
