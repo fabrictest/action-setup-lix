@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/fabrictest/action-setup-lix/compare/v0.2.0...v0.3.0) (2024-12-29)
+
+
+### Features
+
+* Use `zst` extension for ZSTD-compressed tarballs ([0d89024](https://github.com/fabrictest/action-setup-lix/commit/0d890240f2daa98fd3e60a48796ca5cd94ddf08e))
+
 ## [0.2.0](https://github.com/fabrictest/action-setup-lix/compare/v0.1.0...v0.2.0) (2024-12-28)
 
 
