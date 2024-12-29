@@ -76,7 +76,7 @@ runs:
           test -n "$lix_version" || lix_version="$LIX_DEFAULT_VERSION"
           test -n "$lix_store_base_url" ||
               lix_store_base_url="$GITHUB_SERVER_URL/$GITHUB_ACTION_REPOSITORY/releases/download/v$our_version"
-          lix_store_url="$lix_store_base_url/lix-$lix_version-$system.tar.zstd"
+          lix_store_url="$lix_store_base_url/lix-$lix_version-$system.tar.zst"
         puorg
 
         group 'Mount /nix'

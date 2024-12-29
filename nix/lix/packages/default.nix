@@ -22,7 +22,7 @@ let
           pkgs.zstd
         ];
         closureInfo = pkgs.closureInfo { rootPaths = [ lix ]; };
-        fileName = "lix-${lix.version}-${lix.system}.tar.zstd";
+        fileName = "lix-${lix.version}-${lix.system}.tar.zst";
         inherit lix;
       }
       ''
