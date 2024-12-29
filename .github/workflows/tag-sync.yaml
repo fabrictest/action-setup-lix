@@ -20,11 +20,10 @@ jobs:
           commit: ${{ github.event.after }}
         run: |
           set -x
-          tag_full="$GITHUB_REF_NAME"
-          for tag_short in "${tag_full%.*}" "${tag_full%%.*}"; do
+          for tag in "${GITHUB_REF_NAME%.*}" "${GITHUB_REF_NAME%%.*}"; do
             gh api repos/{owner}/{repo}/git/tags \
-                --raw-field tag="$tag_short" \
-                --raw-field message="Release $tag_short → $tag_full" \
+                --raw-field tag="$tag" \
+                --raw-field message="Release $tag → $GITHUB_REF_NAME" \
                 --raw-field object="$commit" \
                 --raw-field type=commit
                 --template 'sha={{.sha}}' |
