@@ -35,7 +35,7 @@ jobs:
         with:
           lix-version: ${{ matrix.build.lix-version }}
           lix-on-tmpfs: true
-          lix-store-base-url: file://${{ steps.lix-stores.outputs.download-path }}
+          lix-store-tar-dir: ${{ steps.lix-stores.outputs.download-path }}
       - name: Set up Cachix
         if: ${{ github.repository_owner == 'fabrictest' }}
         uses: cachix/cachix-action@ad2ddac53f961de1989924296a1f236fcfbaa4fc # v15
