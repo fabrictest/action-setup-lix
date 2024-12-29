@@ -1,9 +1,8 @@
 # deadnix: skip
 { inputs, cell }:
 let
-  l = pkgs.lib // builtins;
-
-  inherit (cell) packages pkgs;
+  inherit (inputs) l;
+  inherit (cell) packages;
 in
 {
   lixPackages = _: _: l.filterAttrs (name: _: name != "lix-stores") packages;

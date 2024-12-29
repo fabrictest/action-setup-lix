@@ -10,7 +10,9 @@
     }:
     std.growOn
       {
-        inherit inputs;
+        inputs = inputs // {
+          l = inputs.nixpkgs.lib // builtins;
+        };
         systems = import systems;
         cellsFrom = ./nix;
         cellBlocks = [

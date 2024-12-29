@@ -26,4 +26,3 @@ jobs:
     with:
       build-matrix: ${{ needs.build.outputs.matrix }}
     secrets: inherit
-

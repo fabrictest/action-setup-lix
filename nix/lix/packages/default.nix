@@ -1,8 +1,7 @@
 # deadnix: skip
 { inputs, cell }:
 let
-  l = pkgs.lib // builtins;
-
+  inherit (inputs) l;
   inherit (cell) pkgs;
 
   lixPackages = l.pipe pkgs.lixVersions [
