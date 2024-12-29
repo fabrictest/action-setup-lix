@@ -1,5 +1,5 @@
 ---
-name: Tag sync
+name: Sync tags
 on:
   push:
     tags:
