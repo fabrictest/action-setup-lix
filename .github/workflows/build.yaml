@@ -83,4 +83,8 @@ jobs:
         env:
           download_path: ${{ steps.build-files.outputs.download-path }}
         run: |
-          cat "$download_path"/*.jsonl | jq --compact-output --slurp '{build: .}' | xargs printf json=%s\\n >>"$GITHUB_OUTPUT"
+          {
+            echo json'<<'JSON
+            cat "$download_path"/*.jsonl | jq --compact-output --slurp {build:.}
+            echo JSON
+          } | tee -a "$GITHUB_OUTPUT"
