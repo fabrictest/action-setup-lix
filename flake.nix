@@ -8,9 +8,14 @@
       systems,
       ...
     }:
+    let
+      l = inputs.nixpkgs.lib // builtins;
+    in
     std.growOn
       {
-        inherit inputs;
+        inputs = inputs // {
+          inherit l;
+        };
         systems = import systems;
         cellsFrom = ./nix;
         cellBlocks = [
