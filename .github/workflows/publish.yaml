@@ -2,31 +2,26 @@
 name: Publish
 on:
   workflow_call:
-    outputs:
-      tag:
-        description: |
-          The release tag, or `''` if there was no release.
-
-          Example: `v1.2.3`.
-        value: ${{ jobs.action.outputs.tag }}
     secrets:
-      CICD_PRIVATE_KEY:
+      RELEASE_PLEASE_PRIVATE_KEY:
+        description: |
+          Private key of the GitHub app used with the release-please action.
         required: true
 jobs:
-  action:
-    name: Action
+  release:
+    name: Release
     runs-on: ubuntu-24.04
     outputs:
       released: ${{ steps.release.outputs.release_created }}
       tag: ${{ steps.release.outputs.tag_name }}
-      sha: ${{ steps.release.outputs.sha }}
+      commit: ${{ steps.release.outputs.sha }}
     steps:
       - name: Generate app token
         id: app-token
         uses: actions/create-github-app-token@c1a285145b9d317df6ced56c09f525b5c2b6f755 # v1.11.1
         with:
-          app-id: ${{ vars.CICD_APP_ID }}
-          private-key: ${{ secrets.CICD_PRIVATE_KEY }}
+          app-id: ${{ vars.RELEASE_PLEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_PLEASE_PRIVATE_KEY }}
       - name: Cut release
         id: release
         uses: googleapis/release-please-action@7987652d64b4581673a76e33ad5e98e3dd56832f # v4.1.3
@@ -38,23 +33,20 @@ jobs:
   lix-stores:
     name: Lix stores
     needs:
-      - action
-    if: ${{ needs.action.outputs.released }}
+      - release
+    if: ${{ needs.release.outputs.released }}
     runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: write
     steps:
-      - name: Generate app token
-        id: app-token
-        uses: actions/create-github-app-token@c1a285145b9d317df6ced56c09f525b5c2b6f755 # v1.11.1
-        with:
-          app-id: ${{ vars.CICD_APP_ID }}
-          private-key: ${{ secrets.CICD_PRIVATE_KEY }}
-      - name: Download Lix stores
+      - name: Download tarballs
         id: lix-stores
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           pattern: lix-stores-*
           merge-multiple: true
-      - name: Verify Lix store attestations
+      - name: Verify tarball integrity
         shell: bash
         env:
           download_path: ${{ steps.lix-stores.outputs.download-path }}
@@ -63,33 +55,28 @@ jobs:
             gh attestation verify "$f" --{,signer-}repo="$GITHUB_REPOSITORY"
           done
       - name: Attach Lix stores to the GitHub release
-        if: ${{ steps.lix-stores.outputs.download-path }}
         shell: bash
         env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_TOKEN: ${{ github.token }}
           download_path: ${{ steps.lix-stores.outputs.download-path }}
-          tag: ${{ needs.action.outputs.tag }}
+          tag: ${{ needs.release.outputs.tag }}
         run: |
           gh release upload "$tag" "$download_path"/lix-*.tar.* --repo="$GITHUB_REPOSITORY"
-  pr:
-    name: PR
+  pull-request:
+    name: Pull request
     needs:
-      - action
+      - release
       - lix-stores
-    if: ${{ needs.action.outputs.released }}
+    if: ${{ needs.release.outputs.released }}
     runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
     steps:
-      - name: Generate app token
-        id: app-token
-        uses: actions/create-github-app-token@c1a285145b9d317df6ced56c09f525b5c2b6f755 # v1.11.1
-        with:
-          app-id: ${{ vars.CICD_APP_ID }}
-          private-key: ${{ secrets.CICD_PRIVATE_KEY }}
       - name: Mark release PR as published
         shell: bash
         env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          commit: ${{ needs.action.outputs.sha }}
-        run: |-
+          GITHUB_TOKEN: ${{ github.token }}
+          commit: ${{ needs.release.outputs.commit }}
+        run: |
           gh pr list --repo="$GITHUB_REPOSITORY" --search="$commit"' is:merged label:"autorelease: tagged" sort:created-desc' --limit 1 --json number --jq '.[0].number' |
-              xargs -I{} -- gh pr edit {} --add-label='autorelease: published' --remove-label='autorelease: tagged' --repo="$GITHUB_REPOSITORY"
+            xargs -I{} -- gh pr edit {} --add-label='autorelease: published' --remove-label='autorelease: tagged' --repo="$GITHUB_REPOSITORY"

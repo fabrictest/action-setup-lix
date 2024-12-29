@@ -24,6 +24,5 @@ jobs:
     name: Test
     uses: ./.github/workflows/test.yaml
     with:
-      support-matrix: ${{ needs.build.outputs.support-matrix }}
-    secrets:
-      CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      build-matrix: ${{ needs.build.outputs.matrix }}
+    secrets: inherit
