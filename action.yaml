@@ -13,6 +13,14 @@ inputs:
       supported by the version of action-setup-lix you're using by
       going to https://github.com/fabrictest/action-setup-lix/releases.
     required: false
+  lix-on-tmpfs:
+    description: |
+      Installs /nix on a tmpfs mount. This can make Lix operations faster, but
+      you risk running out of memory if your Lix store grows too big. Only
+      enable this if you're absolutely sure the size of your Lix store (and
+      database, logs etc) will be considerably less than the available memory.
+      This option does nothing on MacOS runners.
+    default: false
   nix-conf:
     description: |
       If set, this configuration is written to $XDG_CONFIG_HOME/nix/nix.conf,
@@ -26,15 +34,7 @@ inputs:
       Configure Lix to use the specified token when fetching from GitHub.
       Defaults to `github.token`.
     default: ${{ github.token }}
-  lix-on-tmpfs:
-    description: |
-      Installs /nix on a tmpfs mount. This can make Lix operations faster, but
-      you risk running out of memory if your Lix store grows too big. Only
-      enable this if you're absolutely sure the size of your Lix store (and
-      database, logs etc) will be considerably less than the available memory.
-      This option does nothing on MacOS runners.
-    default: false
-  lix-store-base-url:
+  lix-store-tar-dir:
     description: |
       Internal.
     required: false
@@ -42,105 +42,16 @@ runs:
   using: composite
   steps:
     - shell: bash
+      working-directory: ${{ github.action_path }}
+      run: ./action.bash
       env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
         # renovate: datasource=github-tags depName=lix-project/lix
         LIX_DEFAULT_VERSION: 2.91.1
-        lix_version: ${{ inputs.lix-version }}
-        lix_on_tmpfs: ${{ inputs.lix-on-tmpfs && 'true' || 'false' }}
-        lix_store_base_url: ${{ inputs.lix-store-base-url }}
-        nix_conf: ${{ inputs.nix-conf }}
-        system: >-
-          ${{
-            format('{0}-{1}',
-                (runner.arch == 'ARM64' && 'aarch64') || (runner.arch == 'X64' && 'x86_64') || runner.arch,
-                (runner.os == 'Linux' && 'linux') || (runner.os == 'macOS' && 'darwin') || runner.os
-            )
-          }}
-        tar: ${{ runner.os == 'macOS' && 'gtar' || 'tar' }}
-      run: |
-        :
-        ${{ runner.debug && 'set -x' || '' }}
-
-        group() { printf "::group::%s\n" "$*"; }
-        puorg() { printf "::endgroup::\n"; }
-        error() { printf "::error::%s\n" "$*"; exit 1; }
-
-        group 'Preflight checks'
-          test ! -e /nix -o -w /nix || error "failed to set up Lix: /nix exists but isn't writable"
-
-          : "${GITHUB_ACTION_REPOSITORY:=$GITHUB_REPOSITORY}"
-          : "${XDG_CONFIG_HOME:=$HOME/.config}"
-
-          our_version="$(head -n1 "$GITHUB_ACTION_PATH"/VERSION)"
-          test -n "$lix_version" || lix_version="$LIX_DEFAULT_VERSION"
-          test -n "$lix_store_base_url" ||
-              lix_store_base_url="$GITHUB_SERVER_URL/$GITHUB_ACTION_REPOSITORY/releases/download/v$our_version"
-          lix_store_url="$lix_store_base_url/lix-$lix_version-$system.tar.zstd"
-        puorg
-
-        group 'Mount /nix'
-          if test ! -e /nix; then
-            case "$RUNNER_OS" in
-              Linux)
-                sudo install -d -o "$USER" /nix
-                "$lix_on_tmpfs" && sudo mount -t tmpfs -o "size=90%,mode=0755,uid=$UID,gid=$(id -g)" tmpfs /nix || :
-                ;;
-              macOS)
-                sudo tee -a /etc/synthetic.conf <<<$'nix\nrun\tprivate/var/run\n'
-                sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || :
-                test -L /run || error "failed to set up Lix: apfs.util couldn't symlink /run"
-                stat -f %Sd / | sed -e 's/s[0-9]*$//' | xargs -I{} -- sudo diskutil apfs addVolume {} APFS nix -mountpoint /nix
-                sudo mdutil -i off /nix
-                sudo chown "$USER" /nix
-                ;;
-              *)
-                error "failed to set up Lix: system $system not supported (yet? :)"
-                ;;
-            esac
-          fi
-        puorg
-
-        group 'Install Lix store'
-          case "$lix_store_url" in
-            file://*)
-              lix_store_file="${lix_store_url#file://}"
-              ;;
-            *)
-              curl --fail --location --remote-name --retry-connrefused --silent --show-error --retry 3 "$lix_store_url"
-              lix_store_file="${lix_store_url##*/}"
-              trap 'rm -f "$lix_store_file"' EXIT
-              ;;
-          esac
-          gh attestation verify "$lix_store_file" --{,signer-}repo="$GITHUB_ACTION_REPOSITORY"
-          rm -rf /nix/var/action-setup-lix
-          "$tar" --auto-compress --extract --skip-old-files --directory /nix --strip-components 1 <"$lix_store_file"
-        puorg
-
-        group 'Synthesize nix.conf'
-          mkdir -p "$XDG_CONFIG_HOME/nix"
-          tee -a "$XDG_CONFIG_HOME/nix/nix.conf" <<EOF
-        accept-flake-config = true
-        access-tokens = ${GITHUB_SERVER_URL#*://}=$GITHUB_TOKEN
-        experimental-features = nix-command flakes
-        include $XDG_CONFIG_HOME/nix/$GITHUB_REPOSITORY_ID.conf
-        EOF
-          tee "$XDG_CONFIG_HOME/nix/$GITHUB_REPOSITORY_ID.conf" <<<"$nix_conf"
-        puorg
-
-        group 'Install Lix'
-          CDPATH='' cd "$(readlink /nix/var/action-setup-lix/lix)"
-          ./bin/nix-store --load-db </nix/var/action-setup-lix/registration
-          MANPATH='' . ./etc/profile.d/nix.sh
-          : "${NIX_SSL_CERT_FILE:=$([ ! -e /etc/ssl/cert.pem ] || printf /etc/ssl/cert.pem)}"
-          ./bin/nix-env --install "$PWD"
-          tee -a "$GITHUB_PATH" <<<"$HOME/.nix-profile/bin"
-          tee -a "$GITHUB_ENV" <<EOF
-        NIX_PROFILES=/nix/var/nix/profiles/default $HOME/.nix-profile
-        NIX_USER_PROFILE_DIR=/nix/var/nix/profiles/per-user/$USER
-        NIX_SSL_CERT_FILE=$NIX_SSL_CERT_FILE
-        EOF
-        puorg
+        LIX_VERSION: ${{ inputs.lix-version || null }}
+        LIX_ON_DISK: ${{ !inputs.lix-on-tmpfs || null }}
+        NIX_CONF: ${{ inputs.nix-conf || null }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        LIX_STORE_TAR_DIR: ${{ inputs.lix-store-tar-dir || null }}
 branding:
   icon: package
   color: purple

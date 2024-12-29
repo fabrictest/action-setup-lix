@@ -9,7 +9,7 @@ on:
           for use as input for `strategy.matrix`.
 
           Format: `{"build": [{"lix-version": "<version>", "runs-on": "<os>"}, ...]}`
-        value: ${{ jobs.matrix.outputs.build-matrix }}
+        value: ${{ jobs.matrix.outputs.json }}
 jobs:
   lix-stores:
     strategy:
@@ -69,7 +69,7 @@ jobs:
     name: Matrix
     runs-on: ubuntu-24.04
     outputs:
-      json: ${{ steps.matrix.outputs.json }}
+      json: ${{ steps.matrix.outputs.build-matrix }}
     steps:
       - name: Download build description files from GitHub
         id: build-files
