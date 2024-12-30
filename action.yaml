@@ -34,7 +34,7 @@ inputs:
       Configure Lix to use the specified token when fetching from GitHub.
       Defaults to `github.token`.
     default: ${{ github.token }}
-  lix-store-tar-dir:
+  lix-stores-dir:
     description: |
       Internal.
     required: false
@@ -51,7 +51,7 @@ runs:
         LIX_ON_DISK: ${{ !inputs.lix-on-tmpfs || null }}
         NIX_CONF: ${{ inputs.nix-conf || null }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
-        LIX_STORE_TAR_DIR: ${{ inputs.lix-store-tar-dir || null }}
+        LIX_STORES_DIR: ${{ inputs.lix-stores-dir || null }}
 branding:
   icon: package
   color: purple

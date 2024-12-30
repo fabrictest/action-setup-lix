@@ -14,11 +14,7 @@ jobs:
     steps:
       - name: Tag major and minor versions
         shell: bash
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          commit: ${{ github.event.after }}
-        run: |-
+        run: |
           for tag in "${GITHUB_REF_NAME%.*}" "${GITHUB_REF_NAME%%.*}"; do
             gh api repos/{owner}/{repo}/git/tags \
                 --raw-field tag="$tag" \
@@ -31,3 +27,8 @@ jobs:
                 --raw-field |
               jq .
           done
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          commit: ${{ github.event.after }}

@@ -12,7 +12,7 @@ jobs:
     name: Release
     runs-on: ubuntu-24.04
     outputs:
-      released: ${{ steps.release.outputs.release_created }}
+      go: ${{ steps.release.outputs.release_created }}
       tag: ${{ steps.release.outputs.tag_name }}
       commit: ${{ steps.release.outputs.sha }}
     steps:
@@ -34,7 +34,7 @@ jobs:
     name: Lix stores
     needs:
       - release
-    if: ${{ needs.release.outputs.released }}
+    if: ${{ needs.release.outputs.go }}
     runs-on: ubuntu-24.04
     permissions:
       actions: read
@@ -47,36 +47,44 @@ jobs:
           pattern: lix-stores-*
           merge-multiple: true
       - name: Verify tarball integrity
-        shell: bash
-        env:
-          download_path: ${{ steps.lix-stores.outputs.download-path }}
         run: |
           for f in "$download_path"/lix-*.tar.*; do
             gh attestation verify "$f" --{,signer-}repo="$GITHUB_REPOSITORY"
           done
+        shell: bash
+        env:
+          download_path: ${{ steps.lix-stores.outputs.download-path }}
       - name: Attach Lix stores to the GitHub release
+        run: |
+          gh release upload "$tag" "$download_path"/lix-*.tar.* --repo="$GITHUB_REPOSITORY"
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
           download_path: ${{ steps.lix-stores.outputs.download-path }}
           tag: ${{ needs.release.outputs.tag }}
-        run: |
-          gh release upload "$tag" "$download_path"/lix-*.tar.* --repo="$GITHUB_REPOSITORY"
   pull-request:
     name: Pull request
     needs:
       - release
       - lix-stores
-    if: ${{ needs.release.outputs.released }}
+    if: ${{ needs.release.outputs.go }}
     runs-on: ubuntu-24.04
     permissions:
       pull-requests: write
     steps:
       - name: Mark release PR as published
+        run: |
+          gh pr list \
+              --repo="$GITHUB_REPOSITORY" \
+              --search="$commit"' is:merged label:"autorelease: tagged" sort:created-desc' \
+              --limit 1 \
+              --json number \
+              --jq '.[0].number' |
+            xargs -I{} -- gh pr edit {} \
+              --add-label='autorelease: published' \
+              --remove-label='autorelease: tagged' \
+              --repo="$GITHUB_REPOSITORY"
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
           commit: ${{ needs.release.outputs.commit }}
-        run: |-
-          gh pr list --repo="$GITHUB_REPOSITORY" --search="$commit"' is:merged label:"autorelease: tagged" sort:created-desc' --limit 1 --json number --jq '.[0].number' |
-            xargs -I{} -- gh pr edit {} --add-label='autorelease: published' --remove-label='autorelease: tagged' --repo="$GITHUB_REPOSITORY"
