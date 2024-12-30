@@ -18,7 +18,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           commit: ${{ github.event.after }}
-        run: |
+        run: |-
           for tag in "${GITHUB_REF_NAME%.*}" "${GITHUB_REF_NAME%%.*}"; do
             gh api repos/{owner}/{repo}/git/tags \
                 --raw-field tag="$tag" \

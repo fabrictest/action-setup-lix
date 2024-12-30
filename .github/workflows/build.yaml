@@ -82,7 +82,7 @@ jobs:
         shell: bash
         env:
           download_path: ${{ steps.build-files.outputs.download-path }}
-        run: |
+        run: |-
           {
             echo build-matrix'<<'JSON
             cat "$download_path"/*.jsonl | jq --slurp {build:.}

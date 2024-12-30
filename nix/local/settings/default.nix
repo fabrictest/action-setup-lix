@@ -5,6 +5,8 @@ let
   inherit (cell) pkgs;
 in
 rec {
+
+  # https://editorconfig.org
   editorconfig = lib.dev.mkNixago lib.cfg.editorconfig {
     data = {
       root = true;
@@ -65,7 +67,7 @@ rec {
   treefmt = lib.dev.mkNixago lib.cfg.treefmt {
 
     # NOTE(ttlgcc): Whenever in doubt about how to fix tool conflicts,
-    # follow this simple rule:
+    #  follow this simple rule:
     #
     #     Format, then lint.
 
@@ -87,11 +89,24 @@ rec {
 
         # https://waterlan.home.xs4all.nl/dos2unix.html
         dos2unix = {
-          command = l.getExe' pkgs.dos2unix "dos2unix";
-          options = l.cli.toGNUCommandLine { } {
-            add-eol = true;
-            keepdate = true;
-          };
+          command =
+            let
+              dos2unix = l.getExe' pkgs.dos2unix "dos2unix";
+              options = l.cli.toGNUCommandLine { } {
+                add-eol = true;
+                keepdate = true;
+              };
+
+              # NOTE(ttlgcc): Running `dos2unix` by itself will give lots of
+              #  "operation not permitted" errors.  Allowing dos2unix to use
+              #  temporary files while formatting solves this issue.
+              dos2unix-newfile = pkgs.writeShellScriptBin "dos2unix-newfile" ''
+                printf %s\\n "''$@" |
+                  xargs -I{} -- printf ' --newfile "%s" "%s"' {} {} |
+                  xargs -- '${dos2unix}' ${l.toString options}
+              '';
+            in
+            l.getExe dos2unix-newfile;
           includes = [ "*" ];
           priority = -10;
         };
@@ -161,14 +176,19 @@ rec {
 
         # https://git.peppe.rs/languages/statix/about/
         statix = {
-          command = l.getExe (
-            pkgs.writeShellScriptBin "statix-fix" ''
+          command =
+          let
+
+            # NOTE(ttlgcc): statix doesn't support fixing multiple files at once,
+            #  so we're fixing them one by one.
+            statix-fix = pkgs.writeShellScriptBin "statix-fix" ''
               for file in "''$@"
               do
                 '${l.getExe pkgs.statix}' fix --config '${statix.configFile}' "''$file"
               done
-            ''
-          );
+            '';
+          in
+           l.getExe statix-fix;
           includes = [ "*.nix" ];
           priority = 1;
         };
@@ -184,7 +204,7 @@ rec {
         };
       };
 
-      # Sh
+      # Bash, Sh
       formatter = {
 
         # https://www.shellcheck.net/wiki/Home
@@ -204,7 +224,6 @@ rec {
         shfmt = {
           command = l.getExe pkgs.shfmt;
           options = l.cli.toGNUCommandLine { } {
-            binary-next-line = true;
             simplify = true;
             write = true;
           };
