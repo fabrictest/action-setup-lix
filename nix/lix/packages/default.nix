@@ -4,7 +4,7 @@ let
   inherit (inputs) l;
   inherit (cell) pkgs;
 
-  lixPackages = l.pipe pkgs.lixVersions [
+  lixVersions = l.pipe pkgs.lixVersions [
     (l.filterAttrs (_: l.isDerivation))
     (l.mapAttrs' (
       _: lix: l.nameValuePair "${lix.pname}-${l.replaceStrings [ "." ] [ "_" ] lix.version}" lix
@@ -12,7 +12,7 @@ let
   ];
 
   mkLixStore =
-    lix:
+    _: lix:
     pkgs.runCommand "mk-lix-store"
       {
         buildInputs = [
@@ -23,20 +23,24 @@ let
         closureInfo = pkgs.closureInfo { rootPaths = [ lix ]; };
         fileName = "lix-${lix.version}-${lix.system}.tar.zstd";
         inherit lix;
+
+        # FIXME(ttlgcc): Can we fetch this info from somewhere else?
+        #  Perhaps from .config/prj_id, as we do in action.yaml?
+        MY_ID = "action-setup-lix";
       }
       ''
-        mkdir -p root/nix/var/{nix,action-setup-lix} "$out"
-        ln -s "$lix" root/nix/var/action-setup-lix/lix
-        cp {"$closureInfo",root/nix/var/action-setup-lix}/registration
+        mkdir -p root/nix/var/{nix,"$MY_ID"} "$out"
+        ln -s "$lix" root/nix/var/"$MY_ID"/lix
+        cp {"$closureInfo",root/nix/var/"MY_ID"}/registration
         tar --auto-compress --create --directory=root --file="$out/$fileName" --files-from="$closureInfo"/store-paths nix
       '';
 in
-lixPackages
+lixVersions
 // {
   lix-stores =
     (pkgs.buildEnv {
       name = "lix-stores";
-      paths = l.mapAttrsToList (_: mkLixStore) lixPackages;
+      paths = l.mapAttrsToList mkLixStore lixVersions;
     }).overrideAttrs
       {
         preferLocalBuild = false;

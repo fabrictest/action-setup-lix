@@ -26,7 +26,8 @@ group 'Preflight checks'
 	: "${LIX_SYSTEM:=$(uname -m | sed -e 's/^arm/aarch/g')-$(uname -s | tr '[:upper:]' '[:lower:]')}"
 	: "${LIX_STORE_FILE:="lix-$LIX_VERSION-$LIX_SYSTEM.tar.zstd"}"
 	: "${LIX_STORES_DIR:="$RUNNER_TEMP"}"
-	: "${OUR_VERSION:=$(head -n1 "$GITHUB_ACTION_PATH/VERSION")}"
+	: "${MY_ID:=$(head -n1 "$GITHUB_ACTION_PATH/.config/prj_id")}"
+	: "${MY_VERSION:=$(head -n1 "$GITHUB_ACTION_PATH/VERSION")}"
 }
 endgroup
 
@@ -57,17 +58,17 @@ endgroup
 
 group 'Install Lix store'
 {
-	cd "$LIX_STORES_DIR"
+	pushd "$LIX_STORES_DIR"
 	test -f "$LIX_STORE_FILE" ||
-		gh release download "v$OUR_VERSION" \
+		gh release download "v$MY_VERSION" \
 			--output "$LIX_STORE_FILE" \
 			--pattern "$LIX_STORE_FILE" \
 			--repo "$GITHUB_ACTION_REPOSITORY"
 	gh attestation verify "$LIX_STORE_FILE" --{,signer-}repo="$GITHUB_ACTION_REPOSITORY"
-	rm -rf "/nix/var/${GITHUB_ACTION_REPOSITORY#*/}"
+	rm -rf "/nix/var/$MY_ID"
 	test "$RUNNER_OS" != macOS && tar=tar || tar=gtar
 	$tar --auto-compress --extract --skip-old-files --directory /nix --strip-components 1 <"$LIX_STORE_FILE"
-	cd -
+	popd
 }
 endgroup
 
