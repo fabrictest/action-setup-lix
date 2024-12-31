@@ -64,4 +64,4 @@ jobs:
     name: Examples
     uses: ./.github/workflows/examples.yaml
     with:
-      build-matrix: ${{ fromJson(inputs.build-matrix) }}
+      build-matrix: ${{ inputs.build-matrix }}
