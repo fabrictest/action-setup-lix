@@ -48,7 +48,7 @@ runs:
         # renovate: datasource=github-tags depName=lix-project/lix
         LIX_DEFAULT_VERSION: 2.91.1
         LIX_VERSION: ${{ inputs.lix-version || null }}
-        LIX_ON_DISK: ${{ inputs.lix-on-tmpfs == 'true' && null || '1' }}
+        LIX_ON_DISK: ${{ inputs.lix-on-tmpfs != 'true' || null }}
         NIX_CONF: ${{ inputs.nix-conf || null }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
         LIX_STORES_DIR: ${{ inputs.lix-stores-dir || null }}
