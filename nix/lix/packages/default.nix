@@ -31,7 +31,7 @@ let
       ''
         mkdir -p root/nix/var/{nix,"$MY_ID"} "$out"
         ln -s "$lix" root/nix/var/"$MY_ID"/lix
-        cp {"$closureInfo",root/nix/var/"MY_ID"}/registration
+        cp {"$closureInfo",root/nix/var/"$MY_ID"}/registration
         tar --auto-compress --create --directory=root --file="$out/$fileName" --files-from="$closureInfo"/store-paths nix
       '';
 in
