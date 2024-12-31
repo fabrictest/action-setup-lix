@@ -5,7 +5,7 @@ on:
     inputs:
       build-matrix:
         description: |
-          A list of Lix versions and supported GitHub Action runners.
+          A list of all Lix versions to test, alongside the supported GHA runners.
 
           Format: `{"build": [{"lix-version": "<version>", "runs-on": "<os>"}, ...]}`
         type: string
@@ -16,11 +16,12 @@ on:
           The token with which to authenticate to Cachix.
         required: true
 jobs:
-  install:
+  cachix:
     strategy:
       fail-fast: true
       matrix: ${{ fromJson(inputs.build-matrix) }}
-    name: Installation
+    name: With Cachix
+    if: ${{ github.repository_owner == 'fabrictest' }}
     runs-on: ${{ matrix.build.runs-on }}
     steps:
       - name: Check out repository
@@ -35,29 +36,32 @@ jobs:
         with:
           lix-version: ${{ matrix.build.lix-version }}
           lix-on-tmpfs: true
-          lix-store-tar-dir: ${{ steps.lix-stores.outputs.download-path }}
+          lix-stores-dir: ${{ steps.lix-stores.outputs.download-path }}
       - name: Set up Cachix
-        if: ${{ github.repository_owner == 'fabrictest' }}
         uses: cachix/cachix-action@ad2ddac53f961de1989924296a1f236fcfbaa4fc # v15
         with:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
           name: ${{ vars.CACHIX_NAME }}
           skipPush: true
       - name: Verify that Lix was installed
-        shell: bash
         run: |
           nix-build -v --version
+        shell: bash
       - name: Verify that one can add a file to the Lix store
         id: lix-store-add
-        shell: bash
         run: |
           git rev-parse HEAD >probe
           nix-store --add probe | xargs printf probe=%s\\n >>"$GITHUB_OUTPUT"
+        shell: bash
       - name: Verify that one can push such file to Cachix
-        if: ${{ github.repository_owner == 'fabrictest' }}
+        run: |
+          cachix push "$cache" "$probe"
         shell: bash
         env:
           cache: ${{ vars.CACHIX_NAME }}
           probe: ${{ steps.lix-store-add.outputs.probe }}
-        run: |-
-          cachix push "$cache" "$probe"
+  examples:
+    name: Examples
+    uses: ./.github/workflows/examples.yaml
+    with:
+      build-matrix: ${{ inputs.build-matrix }}

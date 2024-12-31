@@ -5,8 +5,8 @@ on:
     outputs:
       matrix:
         description: |
-          A list of Lix versions built for each GitHub runner,
-          for use as input for `strategy.matrix`.
+          A list of all Lix versions built by this job, along with the supported
+          GHA runners.  For use with `strategy.matrix`.
 
           Format: `{"build": [{"lix-version": "<version>", "runs-on": "<os>"}, ...]}`
         value: ${{ jobs.matrix.outputs.json }}
@@ -49,18 +49,19 @@ jobs:
           path: result/lix-*.tar.*
           retention-days: ${{ github.ref_name == github.event.repository.default_branch && null || 1 }}
       - name: Generate file specifying which Lix versions were built for this platform
-        shell: bash
-        env:
-          runs_on: ${{ matrix.runs-on }}
         run: |
           printf %s\\n result/lix-*.tar.* |
             cut -d - -f 2 |
-            jq --compact-output --raw-input --arg runs-on "$runs_on" '{"lix-version": .} + $ARGS.named' >build-"$runs_on".jsonl
+            jq --compact-output --raw-input --arg runs-on "$runs_on" \
+              '{"lix-version": .} + $ARGS.named' >build-matrix-"$runs_on".jsonl
+        shell: bash
+        env:
+          runs_on: ${{ matrix.runs-on }}
       - name: Upload build description file to GitHub
         uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
-          name: build-${{ matrix.runs-on }}
-          path: build-${{ matrix.runs-on }}.jsonl
+          name: build-matrix-${{ matrix.runs-on }}
+          path: build-matrix-${{ matrix.runs-on }}.jsonl
           compression-level: 9
           retention-days: 1
   matrix:
@@ -75,16 +76,14 @@ jobs:
         id: build-files
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
-          pattern: build-*
+          pattern: build-matrix-*
           merge-multiple: true
       - name: Generate build matrix
         id: matrix
+        run: |
+          echo build-matrix'<<'JSON >>"$GITHUB_OUTPUT"
+          cat "$download_path"/*.jsonl | jq --slurp '{build: .}' | tee -a "$GITHUB_OUTPUT"
+          echo JSON >>"$GITHUB_OUTPUT"
         shell: bash
         env:
           download_path: ${{ steps.build-files.outputs.download-path }}
-        run: |-
-          {
-            echo build-matrix'<<'JSON
-            cat "$download_path"/*.jsonl | jq --slurp {build:.}
-            echo JSON
-          } | tee -a "$GITHUB_OUTPUT"
