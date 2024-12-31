@@ -5,8 +5,8 @@ on:
     outputs:
       matrix:
         description: |
-          A list of Lix versions built for each GitHub runner,
-          for use as input for `strategy.matrix`.
+          A list of all Lix versions built by this job, along with the supported
+          GHA runners.  For use with `strategy.matrix`.
 
           Format: `{"build": [{"lix-version": "<version>", "runs-on": "<os>"}, ...]}`
         value: ${{ jobs.matrix.outputs.json }}
