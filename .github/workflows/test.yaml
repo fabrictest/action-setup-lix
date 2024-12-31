@@ -61,9 +61,6 @@ jobs:
           cache: ${{ vars.CACHIX_NAME }}
           probe: ${{ steps.lix-store-add.outputs.probe }}
   examples:
-    strategy:
-      fail-fast: true
-      matrix: ${{ fromJson(inputs.build-matrix) }}
     name: Examples
     uses: ./.github/workflows/examples.yaml
     with:
