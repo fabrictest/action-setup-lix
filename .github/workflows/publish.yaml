@@ -38,6 +38,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       actions: read
+      # attestations: read
       contents: write
     steps:
       - name: Download tarballs
@@ -53,6 +54,7 @@ jobs:
           done
         shell: bash
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           download_path: ${{ steps.lix-stores.outputs.download-path }}
       - name: Attach Lix stores to the GitHub release
         run: |

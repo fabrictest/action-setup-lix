@@ -29,7 +29,7 @@ inputs:
       See https://docs.lix.systems/manual/lix/stable/command-ref/conf-file.html for
       information on what settings that are available. Make sure the settings
       you define are supported by the Lix version you're using.
-    required: false
+    default: ""
   github-token:
     description: |
       Configure Lix to use the specified token when fetching from GitHub.

@@ -7,6 +7,12 @@
         ".github",
         "examples"
       ],
+      "extra-files": [
+        {
+          "type": "generic",
+          "path": "action.bash"
+        }
+      ],
       "release-type": "simple",
       "version-file": "VERSION"
     }
