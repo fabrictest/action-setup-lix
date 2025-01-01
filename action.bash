@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -euxo pipefail
 
 group() {
 	printf "::group::%s\n" "$*"
@@ -51,9 +51,9 @@ endgroup
 group 'Install Lix store'
 {
 	pushd "$LIX_STORES_DIR"
-	# x-release-please-version
+	# x-release-please-start-version
 	test -f "$LIX_STORE_FILE" ||
-		gh release download "v0.2.0" \
+		gh release download "v0.1.0" \
 			--output "$LIX_STORE_FILE" \
 			--pattern "$LIX_STORE_FILE" \
 			--repo "$GITHUB_ACTION_REPOSITORY"
@@ -82,8 +82,8 @@ endgroup
 
 group 'Install Lix'
 {
-	CDPATH='' cd "$(readlink /nix/var/action-setup-lix/lix)"
-	./bin/nix-store --load-db </nix/var/action-setup-lix/registration
+	CDPATH='' cd "$(readlink /nix/var/gha/lix)"
+	./bin/nix-store --load-db </nix/var/gha/registration
 	# shellcheck source=/dev/null
 	MANPATH='' . ./etc/profile.d/nix.sh
 	test -n "${NIX_SSL_CERT_FILE:-}" -o ! -e /etc/ssl/cert.pem ||
