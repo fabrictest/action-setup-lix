@@ -21,13 +21,6 @@ group 'Preflight checks'
 
 	: "${GITHUB_ACTION_REPOSITORY:="$GITHUB_REPOSITORY"}"
 	: "${XDG_CONFIG_HOME:="$HOME/.config"}"
-
-	: "${LIX_VERSION:="$LIX_DEFAULT_VERSION"}"
-	: "${LIX_SYSTEM:=$(uname -m | sed -e 's/^arm/aarch/g')-$(uname -s | tr '[:upper:]' '[:lower:]')}"
-	: "${LIX_STORE_FILE:="lix-$LIX_VERSION-$LIX_SYSTEM.tar.zstd"}"
-	: "${LIX_STORES_DIR:="$RUNNER_TEMP"}"
-	: "${MY_ID:=$(head -n1 "$GITHUB_ACTION_PATH/.config/prj_id")}"
-	: "${MY_VERSION:=$(head -n1 "$GITHUB_ACTION_PATH/VERSION")}"
 }
 endgroup
 
@@ -36,13 +29,12 @@ group 'Mount /nix'
 	test -e /nix || case "$RUNNER_OS" in
 	Linux)
 		sudo install -d -o "$USER" /nix
-		${LIX_ON_DISK:+:} sudo mount -t tmpfs -o "size=90%,mode=0755,uid=$UID,gid=$(id -g)" tmpfs /nix
+		$LIX_ON_DISK || sudo mount -t tmpfs -o "size=90%,mode=0755,uid=$UID,gid=$(id -g)" tmpfs /nix
 		;;
 	macOS)
 		sudo tee -a /etc/synthetic.conf <<<$'nix\nrun\tprivate/var/run\n'
 		sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || :
-		test -L /run ||
-			die "failed to set up Lix: apfs.util couldn't symlink /run"
+		test -L /run || die "failed to set up Lix: apfs.util couldn't symlink /run"
 		stat -f %Sd / |
 			sed -e 's/s[0-9]*$//' |
 			xargs -I{} -- sudo diskutil apfs addVolume {} APFS nix -mountpoint /nix
@@ -59,13 +51,15 @@ endgroup
 group 'Install Lix store'
 {
 	pushd "$LIX_STORES_DIR"
+	# x-release-please-version
 	test -f "$LIX_STORE_FILE" ||
-		gh release download "v$MY_VERSION" \
+		gh release download "v0.2.0" \
 			--output "$LIX_STORE_FILE" \
 			--pattern "$LIX_STORE_FILE" \
 			--repo "$GITHUB_ACTION_REPOSITORY"
+	# x-release-please-end
 	gh attestation verify "$LIX_STORE_FILE" --{,signer-}repo="$GITHUB_ACTION_REPOSITORY"
-	rm -rf "/nix/var/$MY_ID"
+	rm -rf "/nix/var/gha"
 	test "$RUNNER_OS" != macOS && tar=tar || tar=gtar
 	$tar --auto-compress --extract --skip-old-files --directory /nix --strip-components 1 <"$LIX_STORE_FILE"
 	popd

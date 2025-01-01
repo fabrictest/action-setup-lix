@@ -23,15 +23,11 @@ let
         closureInfo = pkgs.closureInfo { rootPaths = [ lix ]; };
         fileName = "lix-${lix.version}-${lix.system}.tar.zstd";
         inherit lix;
-
-        # FIXME(ttlgcc): Can we fetch this info from somewhere else?
-        #  Perhaps from .config/prj_id, as we do in action.yaml?
-        MY_ID = "action-setup-lix";
       }
       ''
-        mkdir -p root/nix/var/{nix,"$MY_ID"} "$out"
-        ln -s "$lix" root/nix/var/"$MY_ID"/lix
-        cp {"$closureInfo",root/nix/var/"$MY_ID"}/registration
+        mkdir -p root/nix/var/{nix,gha} "$out"
+        ln -s "$lix" root/nix/var/gha/lix
+        cp {"$closureInfo",root/nix/var/gha}/registration
         tar --auto-compress --create --directory=root --file="$out/$fileName" --files-from="$closureInfo"/store-paths nix
       '';
 in
