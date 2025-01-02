@@ -51,6 +51,62 @@ rec {
     };
   };
 
+  githubsettings = lib.dev.mkNixago lib.cfg.githubsettings {
+    data = {
+
+      repository =
+        let
+          name = "action-setup-lix";
+        in
+        {
+          inherit name;
+          description = "Install Lix on GitHub Actions faster than you can refresh your browser";
+          homepage = "https://github.com/fabrictest/${name}";
+          topics = "github-actions, lix, nix";
+          visibility = "public";
+          security_and_analysis = null;
+          has_issues = true;
+          has_projects = false;
+          has_wiki = false;
+          is_template = false;
+          default_branch = "main";
+          allow_squash_merge = true;
+          allow_merge_commit = false;
+          allow_rebase_merge = false;
+          allow_auto_merge = true;
+          delete_branch_on_merge = true;
+          allow_update_branch = false;
+          squash_merge_commit_title = "PR_TITLE";
+          squash_merge_commit_message = "PR_BODY";
+          merge_commit_title = "PR_TITLE";
+          merge_commit_message = "PR_BODY";
+          enable_automated_security_fixes = true;
+          enable_vulnerability_alerts = true;
+        };
+
+      # labels = [ ];
+
+      rulesets = [
+        {
+          name = "Prevent contributors from nuking the default branch";
+          target = "branch";
+          enforcement = "evaluate";
+          conditions = {
+            ref_name = {
+              include = [ "~DEFAULT_BRANCH" ];
+              exclude = [ ];
+            };
+          };
+          rules = [
+            { type = "deletion"; }
+            { type = "non_fast_forward"; }
+          ];
+        }
+      ];
+
+    };
+  };
+
   # https://git.peppe.rs/languages/statix/about/
   statix = lib.dev.mkNixago {
     output = "statix.toml";
@@ -100,13 +156,13 @@ rec {
               # NOTE(ttlgcc): Running `dos2unix` by itself will give lots of
               #  "operation not permitted" errors.  Allowing dos2unix to use
               #  temporary files solves this issue.
-              dos2unix-newfile = pkgs.writeShellScriptBin "dos2unix-newfile" ''
+              dos2unix' = pkgs.writeShellScriptBin "dos2unix-newfile" ''
                 printf %s\\n "''$@" |
                   xargs -I{} -- printf ' --newfile "%s" "%s"' {} {} |
                   xargs -- '${dos2unix}' ${l.toString options}
               '';
             in
-            l.getExe dos2unix-newfile;
+            l.getExe dos2unix';
           includes = [ "*" ];
           priority = -10;
         };
@@ -177,18 +233,18 @@ rec {
         # https://git.peppe.rs/languages/statix/about/
         statix = {
           command =
-          let
+            let
 
-            # NOTE(ttlgcc): statix doesn't support fixing multiple files at once,
-            #  so we're fixing them one by one.
-            statix-fix = pkgs.writeShellScriptBin "statix-fix" ''
-              for file in "''$@"
-              do
-                '${l.getExe pkgs.statix}' fix --config '${statix.configFile}' "''$file"
-              done
-            '';
-          in
-           l.getExe statix-fix;
+              # NOTE(ttlgcc): statix doesn't support fixing multiple files at once,
+              #  so we're fixing them one by one.
+              statix-fix = pkgs.writeShellScriptBin "statix-fix" ''
+                for file in "''$@"
+                do
+                  '${l.getExe pkgs.statix}' fix --config '${statix.configFile}' "''$file"
+                done
+              '';
+            in
+            l.getExe statix-fix;
           includes = [ "*.nix" ];
           priority = 1;
         };
@@ -246,6 +302,13 @@ rec {
             conf = yamlfmt.configFile;
           };
           includes = [ "*.yaml" ];
+
+          excludes = [
+            # FIXME(ttlgcc): We're not formatting files committed by release-please just yet.
+            #  We must find a way to trigger a workflow that formats the code right after
+            #  release-please creates/changes the release PR.
+            ".github/settings.ya?ml"
+          ];
         };
       };
     };

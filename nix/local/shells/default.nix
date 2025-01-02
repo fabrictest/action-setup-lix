@@ -11,6 +11,7 @@ in
 
     nixago = [
       settings.editorconfig
+      settings.githubsettings
       settings.treefmt
     ];
   };
