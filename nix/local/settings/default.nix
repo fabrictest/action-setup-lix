@@ -99,7 +99,7 @@ rec {
 
               # NOTE(ttlgcc): Running `dos2unix` by itself will give lots of
               #  "operation not permitted" errors.  Allowing dos2unix to use
-              #  temporary files while formatting solves this issue.
+              #  temporary files solves this issue.
               dos2unix-newfile = pkgs.writeShellScriptBin "dos2unix-newfile" ''
                 printf %s\\n "''$@" |
                   xargs -I{} -- printf ' --newfile "%s" "%s"' {} {} |

@@ -51,7 +51,7 @@ jobs:
       - name: Generate file specifying which Lix versions were built for this platform
         run: |
           printf %s\\n result/lix-*.tar.* |
-            cut -d - -f 2 |
+            cut -d- -f2 |
             jq --compact-output --raw-input --arg runs-on "$runs_on" \
               '{"lix-version": .} + $ARGS.named' >build-matrix-"$runs_on".jsonl
         shell: bash

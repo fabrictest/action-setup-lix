@@ -14,15 +14,15 @@ jobs:
     steps:
       - name: Tag major and minor versions
         run: |
-          for tag in "${GITHUB_REF_NAME%.*}" "${GITHUB_REF_NAME%%.*}"; do
+          for target in "${GITHUB_REF_NAME%%.*}" "${GITHUB_REF_NAME%.*}"; do
             gh api repos/{owner}/{repo}/git/tags \
-                --raw-field tag="$tag" \
-                --raw-field message="Release $tag → $GITHUB_REF_NAME" \
-                --raw-field object="$commit" \
+                --raw-field tag="$target" \
+                --raw-field message="Release $target → $GITHUB_REF_NAME" \
+                --raw-field object="$GITHUB_SHA" \
                 --raw-field type=commit \
                 --template 'sha={{.sha}}' |
               xargs -- gh api repos/{owner}/{repo}/git/refs \
-                --raw-field ref=refs/tags/"$tag" \
+                --raw-field ref=refs/tags/"$target" \
                 --raw-field |
               jq .
           done
@@ -30,4 +30,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          commit: ${{ github.event.after }}
