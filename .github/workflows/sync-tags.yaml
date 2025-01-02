@@ -10,10 +10,9 @@ jobs:
     if: ${{ github.event.created }}
     runs-on: ubuntu-24.04
     permissions:
-      content: write
+      contents: write
     steps:
       - name: Tag major and minor versions
-        shell: bash
         run: |
           for tag in "${GITHUB_REF_NAME%.*}" "${GITHUB_REF_NAME%%.*}"; do
             gh api repos/{owner}/{repo}/git/tags \

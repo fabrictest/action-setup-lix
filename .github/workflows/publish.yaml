@@ -38,7 +38,6 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       actions: read
-      # attestations: read
       contents: write
     steps:
       - name: Download tarballs
