@@ -26,7 +26,7 @@ jobs:
       id-token: write
     steps:
       - name: Bootstrap Lix
-        uses: fabrictest/action-setup-lix@def519a74f4b43c127a41d8d5eb28323ab485710 # v0.1.0
+        uses: fabrictest/action-setup-lix@a745987f4ef56ddcc1df9d7974cef54f0704ca46 # v0.3.0
       - name: Set up Lix cache
         uses: DeterminateSystems/magic-nix-cache-action@87b14cf437d03d37989d87f0fa5ce4f5dc1a330b # v8
         with:
