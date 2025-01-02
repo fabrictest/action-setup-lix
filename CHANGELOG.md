@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/fabrictest/action-setup-lix/compare/v0.2.0...v0.3.0) (2025-01-02)
+
+
+### Features
+
+* Move bash script to its own file ([#23](https://github.com/fabrictest/action-setup-lix/issues/23)) ([9da9e51](https://github.com/fabrictest/action-setup-lix/commit/9da9e5125df45e8d6d9f2e3f714b237af4cf3b96))
+
 ## [0.2.0](https://github.com/fabrictest/action-setup-lix/compare/v0.1.0...v0.2.0) (2024-12-28)
 
 

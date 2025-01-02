@@ -53,7 +53,7 @@ group 'Install Lix store'
 	pushd "$LIX_STORES_DIR"
 	# x-release-please-start-version
 	test -f "$LIX_STORE_FILE" ||
-		gh release download "v0.1.0" \
+		gh release download "v0.3.0" \
 			--output "$LIX_STORE_FILE" \
 			--pattern "$LIX_STORE_FILE" \
 			--repo "$GITHUB_ACTION_REPOSITORY"
