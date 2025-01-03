@@ -1,5 +1,3 @@
-# deadnix: skip
-{ inputs, cell }:
 let
   inherit (inputs) l;
   inherit (cell) pkgs;
@@ -7,12 +5,12 @@ let
   lixVersions = l.pipe pkgs.lixVersions [
     (l.filterAttrs (_: l.isDerivation))
     (l.mapAttrs' (
-      _: lix: l.nameValuePair "${lix.pname}-${l.replaceStrings [ "." ] [ "_" ] lix.version}" lix
+      _: drv: l.nameValuePair "${drv.pname}-${l.replaceStrings [ "." ] [ "_" ] drv.version}" drv
     ))
   ];
 
   mkLixStore =
-    _: lix:
+    lix:
     pkgs.runCommand "mk-lix-store"
       {
         buildInputs = [
@@ -21,7 +19,7 @@ let
           pkgs.zstd
         ];
         closureInfo = pkgs.closureInfo { rootPaths = [ lix ]; };
-        fileName = "lix-${lix.version}-${lix.system}.tar.zstd";
+        fileName = "${lix.pname}-${lix.version}-${lix.system}.tar.zstd";
         inherit lix;
       }
       ''
@@ -36,7 +34,7 @@ lixVersions
   lix-stores =
     (pkgs.buildEnv {
       name = "lix-stores";
-      paths = l.mapAttrsToList mkLixStore lixVersions;
+      paths = l.mapAttrsToList (_: mkLixStore) lixVersions;
     }).overrideAttrs
       {
         preferLocalBuild = false;

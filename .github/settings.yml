@@ -1,13 +1,12 @@
-bypass_actors: []
 repository:
   allow_auto_merge: true
   allow_merge_commit: false
   allow_rebase_merge: false
   allow_squash_merge: true
-  allow_update_branch: false
+  allow_update_branch: true
   default_branch: main
   delete_branch_on_merge: true
-  description: Install Lix on GitHub Actions faster than you can refresh your browser
+  description: Install Lix faster than you can refresh a GitHub Actions workflow page
   enable_automated_security_fixes: true
   enable_vulnerability_alerts: true
   has_issues: true
@@ -21,7 +20,7 @@ repository:
   security_and_analysis: null
   squash_merge_commit_message: PR_BODY
   squash_merge_commit_title: PR_TITLE
-  topics: github-actions, lix, nix
+  topics: github-actions,lix,nix
   visibility: public
 rulesets:
 - conditions:
@@ -29,38 +28,12 @@ rulesets:
       exclude: []
       include:
       - ~DEFAULT_BRANCH
-  enforcement: enabled
+  enforcement: active
   name: Prevent tampering with the default branch
   rules:
   - type: deletion
-  - type: non_fast_forward
-  - parameters:
-      dismiss_stale_reviews_on_push: true
-      require_code_owner_review: true
-      require_last_pull_approval: true
-      required_approving_review_count: 1
-      required_review_thread_resolution: true
-    type: pull_request
   - type: required_linear_history
   - parameters:
-      required_status_checks: []
-      strict_required_status_checks_policy: true
-    type: required_status_checks
+      require_code_owner_review: true
+    type: pull_request
   target: branch
-- conditions:
-    ref_name:
-      exclude: []
-      include:
-      - ~ALL
-  enforcement: enabled
-  name: Prevent tampering with the release tags
-  rules:
-  - type: deletion
-  - type: non_fast_forward
-  - parameters:
-      name: Tags follow the SemVer convention
-      negate: false
-      operator: regex
-      pattern: ^v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$
-    type: tag_name_pattern
-  target: tag

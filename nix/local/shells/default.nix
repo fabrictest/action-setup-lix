@@ -1,18 +1,14 @@
-{ inputs, cell }:
 let
-  inherit (inputs.std) lib std;
-  inherit (cell) settings;
+  inherit (inputs) l std;
 in
 {
-  default = lib.dev.mkShell {
+  default = std.lib.dev.mkShell {
     name = "action-setup-lix";
 
-    imports = [ std.devshellProfiles.default ];
+    imports = [ std.std.devshellProfiles.default ];
 
-    nixago = [
-      settings.editorconfig
-      settings.githubsettings
-      settings.treefmt
-    ];
+    nixago = l.attrValues {
+      inherit (cell.settings) editorconfig githubsettings treefmt;
+    };
   };
 }
