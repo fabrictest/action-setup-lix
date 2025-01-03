@@ -52,6 +52,8 @@ rec {
   };
 
   githubsettings = lib.dev.mkNixago lib.cfg.githubsettings {
+    output = ".github/settings.yaml";
+
     data = {
 
       bypass_actors = [ ];
@@ -64,13 +66,17 @@ rec {
           inherit name;
           description = "Install Lix on GitHub Actions faster than you can refresh your browser";
           homepage = "https://github.com/fabrictest/${name}";
-          /*
-          topics = "github-actions, lix, nix";
+          topics = [
+          "github-actions"
+          "lix"
+          "nix"
+          ];
           visibility = "public";
-          security_and_analysis = null;
+          # security_and_analysis = null;
           has_issues = true;
           has_projects = false;
           has_wiki = false;
+          has_discussions = false;
           is_template = false;
           default_branch = "main";
           allow_squash_merge = true;
@@ -79,13 +85,12 @@ rec {
           allow_auto_merge = true;
           delete_branch_on_merge = true;
           allow_update_branch = true;
-          squash_merge_commit_title = "PR_TITLE";
-          squash_merge_commit_message = "PR_BODY";
-          merge_commit_title = "PR_TITLE";
-          merge_commit_message = "PR_BODY";
-          enable_automated_security_fixes = true;
-          enable_vulnerability_alerts = true;
-          */
+          # squash_merge_commit_title = "PR_TITLE";
+          # squash_merge_commit_message = "PR_BODY";
+          # merge_commit_title = "PR_TITLE";
+          # merge_commit_message = "PR_BODY";
+          # enable_automated_security_fixes = true;
+          # enable_vulnerability_alerts = true;
         };
 
       # labels = [ ];
