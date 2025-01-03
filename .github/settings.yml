@@ -1,0 +1,36 @@
+repository:
+  allow_auto_merge: true
+  allow_merge_commit: false
+  allow_rebase_merge: false
+  allow_squash_merge: true
+  allow_update_branch: false
+  default_branch: main
+  delete_branch_on_merge: true
+  description: Install Lix on GitHub Actions faster than you can refresh your browser
+  enable_automated_security_fixes: true
+  enable_vulnerability_alerts: true
+  has_issues: true
+  has_projects: false
+  has_wiki: false
+  homepage: https://github.com/fabrictest/action-setup-lix
+  is_template: false
+  merge_commit_message: PR_BODY
+  merge_commit_title: PR_TITLE
+  name: action-setup-lix
+  security_and_analysis: null
+  squash_merge_commit_message: PR_BODY
+  squash_merge_commit_title: PR_TITLE
+  topics: github-actions, lix, nix
+  visibility: public
+rulesets:
+- conditions:
+    ref_name:
+      exclude: []
+      include:
+      - ~DEFAULT_BRANCH
+  enforcement: evaluate
+  name: Prevent contributors from nuking the default branch
+  rules:
+  - type: deletion
+  - type: non_fast_forward
+  target: branch
