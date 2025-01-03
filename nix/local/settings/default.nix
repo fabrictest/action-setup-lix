@@ -64,6 +64,7 @@ rec {
           inherit name;
           description = "Install Lix on GitHub Actions faster than you can refresh your browser";
           homepage = "https://github.com/fabrictest/${name}";
+          /*
           topics = "github-actions, lix, nix";
           visibility = "public";
           security_and_analysis = null;
@@ -77,18 +78,20 @@ rec {
           allow_rebase_merge = false;
           allow_auto_merge = true;
           delete_branch_on_merge = true;
-          allow_update_branch = false;
+          allow_update_branch = true;
           squash_merge_commit_title = "PR_TITLE";
           squash_merge_commit_message = "PR_BODY";
           merge_commit_title = "PR_TITLE";
           merge_commit_message = "PR_BODY";
           enable_automated_security_fixes = true;
           enable_vulnerability_alerts = true;
+          */
         };
 
       # labels = [ ];
 
       rulesets = [
+        /*
         {
           name = "Prevent tampering with the default branch";
           target = "branch";
@@ -105,9 +108,10 @@ rec {
             {
               type = "pull_request";
               parameters = {
+                allowed_merge_methods = ["SQUASH"];
+                dismiss_stale_reviews_on_push = true;
                 require_code_owner_review = true;
                 require_last_pull_approval = true;
-                dismiss_stale_reviews_on_push = true;
                 required_approving_review_count = 1;
                 required_review_thread_resolution = true;
               };
@@ -122,7 +126,6 @@ rec {
                 ];
                 strict_required_status_checks_policy = true;
               };
-
             }
           ];
         }
@@ -150,6 +153,7 @@ rec {
             }
           ];
         }
+        */
       ];
     };
   };
