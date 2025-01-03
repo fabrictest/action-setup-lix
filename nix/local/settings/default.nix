@@ -54,6 +54,8 @@ rec {
   githubsettings = lib.dev.mkNixago lib.cfg.githubsettings {
     data = {
 
+      bypass_actors = [ ];
+
       repository =
         let
           name = "action-setup-lix";
@@ -88,9 +90,9 @@ rec {
 
       rulesets = [
         {
-          name = "Prevent contributors from nuking the default branch";
+          name = "Prevent tampering with the default branch";
           target = "branch";
-          enforcement = "evaluate";
+          enforcement = "enabled";
           conditions = {
             ref_name = {
               include = [ "~DEFAULT_BRANCH" ];
@@ -100,10 +102,55 @@ rec {
           rules = [
             { type = "deletion"; }
             { type = "non_fast_forward"; }
+            {
+              type = "pull_request";
+              parameters = {
+                require_code_owner_review = true;
+                require_last_pull_approval = true;
+                dismiss_stale_reviews_on_push = true;
+                required_approving_review_count = 1;
+                required_review_thread_resolution = true;
+              };
+            }
+            { type = "required_linear_history"; }
+            {
+              type = "required_status_checks";
+              parameters = {
+                required_status_checks = [
+                  # TODO(ttlgcc): Gather integration IDs and configure the required status checks.
+                  #  See: https://docs.github.com/en/rest/repos/rules?apiVersion=2022-11-28#update-a-repository-ruleset
+                ];
+                strict_required_status_checks_policy = true;
+              };
+
+            }
+          ];
+        }
+        {
+          name = "Prevent tampering with the release tags";
+          target = "tag";
+          enforcement = "enabled";
+          conditions = {
+            ref_name = {
+              include = [ "~ALL" ];
+              exclude = [ ];
+            };
+          };
+          rules = [
+            { type = "deletion"; }
+            { type = "non_fast_forward"; }
+            {
+              type = "tag_name_pattern";
+              parameters = {
+                name = "Tags follow the SemVer convention";
+                negate = false;
+                operator = "regex";
+                pattern = ''^v?(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?''$'';
+              };
+            }
           ];
         }
       ];
-
     };
   };
 
