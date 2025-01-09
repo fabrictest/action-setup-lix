@@ -25,15 +25,86 @@ repository:
 rulesets:
 - conditions:
     ref_name:
-      exclude: []
       include:
       - ~DEFAULT_BRANCH
   enforcement: active
-  name: Prevent tampering with the default branch
+  name: Prevent tampering with default branch
   rules:
   - type: deletion
+  - type: non_fast_forward
   - type: required_linear_history
-  - parameters:
-      require_code_owner_review: true
-    type: pull_request
   target: branch
+- conditions:
+    ref_name:
+      include:
+      - ~DEFAULT_BRANCH
+  enforcement: active
+  name: Require PRs to pass the quality bar
+  rules:
+  - parameters:
+      check_response_timeout_minutes: 60
+      grouping_strategy: ALLGREEN
+      max_entries_to_build: 5
+      max_entries_to_merge: 5
+      merge_method: SQUASH
+      min_entries_to_merge: 1
+      min_entries_to_merge_wait_minutes: 5
+    type: merge_queue
+  - parameters:
+      allowed_merge_methods:
+      - squash
+      automatic_copilot_code_review_enabled: true
+      dismiss_stale_reviews_on_push: true
+      require_code_owner_review: true
+      require_last_push_approval: true
+      required_approving_review_count: 1
+      required_review_thread_resolution: true
+    type: pull_request
+  - parameters:
+      required_status_checks:
+      - context: Test / Examples (2.90.0, macos-13)
+        integration_id: 15368
+      - context: Test / Examples (2.90.0, macos-15)
+        integration_id: 15368
+      - context: Test / Examples (2.90.0, ubuntu-24.04)
+        integration_id: 15368
+      - context: Test / Examples (2.91.1, macos-13)
+        integration_id: 15368
+      - context: Test / Examples (2.91.1, macos-15)
+        integration_id: 15368
+      - context: Test / Examples (2.91.1, ubuntu-24.04)
+        integration_id: 15368
+      - context: Test / With Cachix (2.90.0, macos-13)
+        integration_id: 15368
+      - context: Test / With Cachix (2.90.0, macos-15)
+        integration_id: 15368
+      - context: Test / With Cachix (2.90.0, ubuntu-24.04)
+        integration_id: 15368
+      - context: Test / With Cachix (2.91.1, macos-13)
+        integration_id: 15368
+      - context: Test / With Cachix (2.91.1, macos-15)
+        integration_id: 15368
+      - context: Test / With Cachix (2.91.1, ubuntu-24.04)
+        integration_id: 15368
+      strict_required_status_checks_policy: false
+    type: required_status_checks
+  target: branch
+- conditions:
+    ref_name:
+      include:
+      - refs/tags/v*
+  enforcement: active
+  name: Prevent deletion of release tags
+  rules:
+  - type: deletion
+  target: tag
+- conditions:
+    ref_name:
+      include:
+      - refs/tags/v*.*.*
+  enforcement: active
+  name: Prevent tampering with release tags
+  rules:
+  - type: non_fast_forward
+  - type: update
+  target: tag
