@@ -45,15 +45,6 @@ rulesets:
   name: Require PRs to pass the quality bar
   rules:
   - parameters:
-      check_response_timeout_minutes: 60
-      grouping_strategy: ALLGREEN
-      max_entries_to_build: 5
-      max_entries_to_merge: 5
-      merge_method: SQUASH
-      min_entries_to_merge: 1
-      min_entries_to_merge_wait_minutes: 5
-    type: merge_queue
-  - parameters:
       allowed_merge_methods:
       - squash
       automatic_copilot_code_review_enabled: true
