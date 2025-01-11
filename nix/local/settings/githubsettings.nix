@@ -21,7 +21,7 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
         private = false;
         visibility = "public";
         has_issues = true;
-        has_projects = true;
+        has_projects = false;
         has_wiki = false;
         is_template = false;
         default_branch = "main";
@@ -40,7 +40,12 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
         enable_vulnerability_alerts = true;
       };
 
-    # labels = [ ];
+    collaborators = [
+      {
+        username = "tautologicc";
+        permission = "admin";
+      }
+    ];
 
     rulesets = [
       {
@@ -49,7 +54,7 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
         enforcement = "active";
         conditions.ref_name = {
           include = [ "~DEFAULT_BRANCH" ];
-          exclude = [];
+          exclude = [ ];
         };
         rules = [
           { type = "deletion"; }
@@ -63,7 +68,7 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
         enforcement = "active";
         conditions.ref_name = {
           include = [ "~DEFAULT_BRANCH" ];
-          exclude = [];
+          exclude = [ ];
         };
         rules = [
           {
@@ -120,7 +125,7 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
         enforcement = "active";
         conditions.ref_name = {
           include = [ "refs/tags/v*" ];
-          exclude = [];
+          exclude = [ ];
         };
         rules = [
           { type = "deletion"; }
@@ -132,7 +137,7 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
         enforcement = "active";
         conditions.ref_name = {
           include = [ "refs/tags/v*.*.*" ];
-          exclude = [];
+          exclude = [ ];
         };
         rules = [
           { type = "non_fast_forward"; }
@@ -140,5 +145,8 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
         ];
       }
     ];
+
+    # labels = [ ];
+
   };
 }

@@ -1,3 +1,6 @@
+collaborators:
+- permission: admin
+  username: tautologicc
 repository:
   allow_auto_merge: true
   allow_merge_commit: false
@@ -10,7 +13,7 @@ repository:
   enable_automated_security_fixes: false
   enable_vulnerability_alerts: true
   has_issues: true
-  has_projects: true
+  has_projects: false
   has_wiki: false
   homepage: https://github.com/fabrictest/action-setup-lix
   is_template: false
