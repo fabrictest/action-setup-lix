@@ -39,7 +39,11 @@ rulesets:
   - type: non_fast_forward
   - type: required_linear_history
   target: branch
-- conditions:
+- bypass_actors:
+  - actor_id: 5
+    actor_type: RepositoryRole
+    bypass_mode: always
+  conditions:
     ref_name:
       exclude: []
       include:

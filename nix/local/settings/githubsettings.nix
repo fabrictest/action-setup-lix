@@ -118,6 +118,13 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
             };
           }
         ];
+        bypass_actors = [
+          {
+            actor_id = 5;
+            actor_type = "RepositoryRole";
+            bypass_mode = "always";
+          }
+        ];
       }
       {
         target = "tag";
