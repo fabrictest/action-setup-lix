@@ -63,10 +63,11 @@
         cellsFrom = ./nix;
 
         cellBlocks = [
-          (std.blockTypes.nixago "settings")
           (std.blockTypes.devshells "shells")
+          (std.blockTypes.functions "lib")
           (std.blockTypes.functions "overlays")
           (std.blockTypes.installables "packages")
+          (std.blockTypes.nixago "settings")
           (std.blockTypes.pkgs "pkgs")
         ];
       }

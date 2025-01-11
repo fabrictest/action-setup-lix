@@ -53,7 +53,7 @@ jobs:
           printf %s\\n result/lix-*.tar.* |
             cut -d- -f2 |
             jq --compact-output --raw-input --arg runs-on "$runs_on" \
-              '{"lix-version": .} + $ARGS.named' >build-matrix-"$runs_on".jsonl
+              '{"lix-version":.} + $ARGS.named' >build-matrix-"$runs_on".jsonl
         shell: bash
         env:
           runs_on: ${{ matrix.runs-on }}
@@ -82,7 +82,7 @@ jobs:
         id: matrix
         run: |
           echo build-matrix'<<'JSON >>"$GITHUB_OUTPUT"
-          cat "$download_path"/*.jsonl | jq --slurp '{build: .}' | tee -a "$GITHUB_OUTPUT"
+          cat "$download_path"/*.jsonl | jq --slurp {build:.} | tee -a "$GITHUB_OUTPUT"
           echo JSON >>"$GITHUB_OUTPUT"
         shell: bash
         env:

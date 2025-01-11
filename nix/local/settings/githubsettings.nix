@@ -1,35 +1,44 @@
 # https://github.com/apps/settings
 let
-  inherit (inputs) l std;
+  inherit (inputs) self l std;
+  inherit (inputs.cells) lix;
 in
 std.lib.dev.mkNixago std.lib.cfg.githubsettings {
   data = {
 
-    repository = {
-      name = "action-setup-lix";
-      description = "Install Lix faster than you can refresh a GitHub Actions workflow page";
-      homepage = "https://github.com/fabrictest/action-setup-lix";
-      topics = "github-actions,lix,nix";
-      visibility = "public";
-      security_and_analysis = null;
-      has_issues = true;
-      has_projects = false;
-      has_wiki = false;
-      is_template = false;
-      default_branch = "main";
-      allow_squash_merge = true;
-      allow_merge_commit = false;
-      allow_rebase_merge = false;
-      allow_auto_merge = true;
-      delete_branch_on_merge = true;
-      allow_update_branch = true;
-      squash_merge_commit_title = "PR_TITLE";
-      squash_merge_commit_message = "PR_BODY";
-      merge_commit_title = "PR_TITLE";
-      merge_commit_message = "PR_BODY";
-      enable_automated_security_fixes = true;
-      enable_vulnerability_alerts = true;
-    };
+    repository =
+      let
+        name = l.pipe (self + /.config/prj_id) [
+          l.readFile
+          l.trim
+        ];
+      in
+      {
+        inherit name;
+        description = "Install Lix faster than you can refresh a GitHub Actions workflow page";
+        homepage = "https://github.com/fabrictest/${name}";
+        topics = "github-actions,lix,nix";
+        private = false;
+        visibility = "public";
+        has_issues = true;
+        has_projects = true;
+        has_wiki = false;
+        is_template = false;
+        default_branch = "main";
+        allow_squash_merge = true;
+        allow_merge_commit = false;
+        allow_rebase_merge = false;
+        allow_auto_merge = true;
+        delete_branch_on_merge = true;
+        allow_update_branch = true;
+        use_squash_pr_title_as_default = true;
+        squash_merge_commit_title = "PR_TITLE";
+        squash_merge_commit_message = "PR_BODY";
+        merge_commit_title = "PR_TITLE";
+        merge_commit_message = "PR_BODY";
+        enable_automated_security_fixes = false;
+        enable_vulnerability_alerts = true;
+      };
 
     # labels = [ ];
 
@@ -38,7 +47,10 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
         target = "branch";
         name = "Prevent tampering with default branch";
         enforcement = "active";
-        conditions.ref_name.include = [ "~DEFAULT_BRANCH" ];
+        conditions.ref_name = {
+          include = [ "~DEFAULT_BRANCH" ];
+          exclude = [];
+        };
         rules = [
           { type = "deletion"; }
           { type = "non_fast_forward"; }
@@ -49,7 +61,10 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
         target = "branch";
         name = "Require PRs to pass the quality bar";
         enforcement = "active";
-        conditions.ref_name.include = [ "~DEFAULT_BRANCH" ];
+        conditions.ref_name = {
+          include = [ "~DEFAULT_BRANCH" ];
+          exclude = [];
+        };
         rules = [
           {
             type = "merge_queue";
@@ -81,39 +96,44 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
               strict_required_status_checks_policy = false;
               required_status_checks =
                 let
-                  context = l.cartesianProduct {
-                    workflow = [
-                      "Test"
-                    ];
-                    job = [
-                      "Examples"
-                      "With Cachix"
-                    ];
-                    lix-version = [
-                      "2.90.0"
-                      "2.91.1"
-                    ]; # TODO(ttlgcc): Get versions from `lix` cell.
-                    runs-on = [
-                      "macos-13"
-                      "macos-15"
-                      "ubuntu-24.04"
-                    ];
-                  };
-                in
-                l.cartesianProduct {
-                  context = l.map (c: "${c.workflow} / ${c.job} (${c.lix-version}, ${c.runs-on})") context;
+                  workflowBuild = cell.lib.readYAML (self + /.github/workflows/build.yaml);
+                  workflowTest = cell.lib.readYAML (self + /.github/workflows/test.yaml);
+                  workflow = [ workflowTest.name ];
+                  job = l.mapAttrsToList (_: job: job.name) workflowTest.jobs;
+                  lix-version = l.pipe lix.packages [
+                    (l.filterAttrs (name: _: name != "lix-stores"))
+                    (l.mapAttrsToList (_: drv: drv.version))
+                  ];
+                  inherit (workflowBuild.jobs.lix-stores.strategy.matrix) runs-on;
+                  context =
+                    l.pipe
+                      {
+                        inherit
+                          workflow
+                          job
+                          lix-version
+                          runs-on
+                          ;
+                      }
+                      [
+                        l.cartesianProduct
+                        (l.map (c: "${c.workflow} / ${c.job} (${c.lix-version}, ${c.runs-on})"))
+                      ];
                   integration_id = [ 15368 ]; # GitHub Actions
-                };
+                in
+                l.cartesianProduct { inherit context integration_id; };
             };
           }
         ];
       }
-
       {
         target = "tag";
         name = "Prevent deletion of release tags";
         enforcement = "active";
-        conditions.ref_name.include = [ "refs/tags/v*" ];
+        conditions.ref_name = {
+          include = [ "refs/tags/v*" ];
+          exclude = [];
+        };
         rules = [
           { type = "deletion"; }
         ];
@@ -122,7 +142,10 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
         target = "tag";
         name = "Prevent tampering with release tags";
         enforcement = "active";
-        conditions.ref_name.include = [ "refs/tags/v*.*.*" ];
+        conditions.ref_name = {
+          include = [ "refs/tags/v*.*.*" ];
+          exclude = [];
+        };
         rules = [
           { type = "non_fast_forward"; }
           { type = "update"; }

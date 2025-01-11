@@ -1,7 +1,4 @@
-let
-  inherit (inputs) std;
-in
-std.findTargets {
+inputs.std.findTargets {
   inherit inputs cell;
   block = ./.;
 }

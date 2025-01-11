@@ -7,24 +7,26 @@ repository:
   default_branch: main
   delete_branch_on_merge: true
   description: Install Lix faster than you can refresh a GitHub Actions workflow page
-  enable_automated_security_fixes: true
+  enable_automated_security_fixes: false
   enable_vulnerability_alerts: true
   has_issues: true
-  has_projects: false
+  has_projects: true
   has_wiki: false
   homepage: https://github.com/fabrictest/action-setup-lix
   is_template: false
   merge_commit_message: PR_BODY
   merge_commit_title: PR_TITLE
   name: action-setup-lix
-  security_and_analysis: null
+  private: false
   squash_merge_commit_message: PR_BODY
   squash_merge_commit_title: PR_TITLE
   topics: github-actions,lix,nix
+  use_squash_pr_title_as_default: true
   visibility: public
 rulesets:
 - conditions:
     ref_name:
+      exclude: []
       include:
       - ~DEFAULT_BRANCH
   enforcement: active
@@ -36,6 +38,7 @@ rulesets:
   target: branch
 - conditions:
     ref_name:
+      exclude: []
       include:
       - ~DEFAULT_BRANCH
   enforcement: active
@@ -62,18 +65,6 @@ rulesets:
     type: pull_request
   - parameters:
       required_status_checks:
-      - context: Test / Examples (2.90.0, macos-13)
-        integration_id: 15368
-      - context: Test / Examples (2.90.0, macos-15)
-        integration_id: 15368
-      - context: Test / Examples (2.90.0, ubuntu-24.04)
-        integration_id: 15368
-      - context: Test / Examples (2.91.1, macos-13)
-        integration_id: 15368
-      - context: Test / Examples (2.91.1, macos-15)
-        integration_id: 15368
-      - context: Test / Examples (2.91.1, ubuntu-24.04)
-        integration_id: 15368
       - context: Test / With Cachix (2.90.0, macos-13)
         integration_id: 15368
       - context: Test / With Cachix (2.90.0, macos-15)
@@ -86,11 +77,24 @@ rulesets:
         integration_id: 15368
       - context: Test / With Cachix (2.91.1, ubuntu-24.04)
         integration_id: 15368
+      - context: Test / Examples (2.90.0, macos-13)
+        integration_id: 15368
+      - context: Test / Examples (2.90.0, macos-15)
+        integration_id: 15368
+      - context: Test / Examples (2.90.0, ubuntu-24.04)
+        integration_id: 15368
+      - context: Test / Examples (2.91.1, macos-13)
+        integration_id: 15368
+      - context: Test / Examples (2.91.1, macos-15)
+        integration_id: 15368
+      - context: Test / Examples (2.91.1, ubuntu-24.04)
+        integration_id: 15368
       strict_required_status_checks_policy: false
     type: required_status_checks
   target: branch
 - conditions:
     ref_name:
+      exclude: []
       include:
       - refs/tags/v*
   enforcement: active
@@ -100,6 +104,7 @@ rulesets:
   target: tag
 - conditions:
     ref_name:
+      exclude: []
       include:
       - refs/tags/v*.*.*
   enforcement: active

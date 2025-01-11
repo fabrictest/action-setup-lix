@@ -1,5 +1,6 @@
 let
   inherit (inputs) l std;
+  inherit (cell) pkgs;
 in
 {
   default = std.lib.dev.mkShell {
@@ -10,5 +11,7 @@ in
     nixago = l.attrValues {
       inherit (cell.settings) editorconfig githubsettings treefmt;
     };
+
+    packages = [ pkgs.yq ];
   };
 }
