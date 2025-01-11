@@ -67,18 +67,6 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
         };
         rules = [
           {
-            type = "merge_queue";
-            parameters = {
-              merge_method = "SQUASH";
-              max_entries_to_build = 5;
-              min_entries_to_merge = 1;
-              max_entries_to_merge = 5;
-              min_entries_to_merge_wait_minutes = 5;
-              grouping_strategy = "ALLGREEN";
-              check_response_timeout_minutes = 60;
-            };
-          }
-          {
             type = "pull_request";
             parameters = {
               required_approving_review_count = 1;
