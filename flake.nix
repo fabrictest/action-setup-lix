@@ -75,7 +75,7 @@
         overlays.lixPackages = std.harvest self [
           "lix"
           "overlays"
-          "lixPackages"
+          "packages"
         ];
 
         packages = std.harvest self [

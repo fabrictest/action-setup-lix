@@ -1,1 +1,3 @@
-inputs.nixpkgs.appendOverlays [ cell.overlays.preferRemoteFetch ]
+inputs.nixpkgs.appendOverlays [
+  (self: super: super.prefer-remote-fetch self super)
+]
