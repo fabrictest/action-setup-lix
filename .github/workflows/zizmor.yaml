@@ -20,10 +20,9 @@ jobs:
           persist-credentials: false
       - name: Run zizmor
         run: |
-          pipx run -- zizmor --format=sarif --persona=pedantic . >zizmor.sarif
+          env GH_HOST="${GITHUB_SERVER_URL#*://}" pipx run -- zizmor --quiet --format=sarif --persona=pedantic . >zizmor.sarif
         shell: bash
         env:
-          GH_HOST: github.com
           GH_TOKEN: ${{ github.token }}
       - name: Upload SARIF report to GitHub
         uses: github/codeql-action/upload-sarif@b6a472f63d85b9c78a3ac5e89422239fc15e9b3c # v3.28.1
