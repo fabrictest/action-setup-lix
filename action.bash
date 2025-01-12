@@ -50,13 +50,11 @@ endgroup
 
 group 'Install Lix store'
 {
-	# x-release-please-start-version
 	test -f "$LIX_STORE_FILE" ||
-		gh release download "v0.3.0" \
+		gh release download "v$(cat "$GITHUB_ACTION_PATH/VERSION")" \
 			--output "${LIX_STORE_FILE##*/}" \
 			--pattern "${LIX_STORE_FILE##*/}" \
 			--repo "$GITHUB_ACTION_REPOSITORY"
-	# x-release-please-end
 	gh attestation verify "$LIX_STORE_FILE" --{,signer-}repo="$GITHUB_ACTION_REPOSITORY"
 	rm -rf "/nix/var/gha"
 	test "$RUNNER_OS" != macOS && tar=tar || tar=gtar
