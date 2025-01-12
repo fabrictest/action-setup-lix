@@ -50,19 +50,17 @@ endgroup
 
 group 'Install Lix store'
 {
-	pushd "$LIX_STORES_DIR"
 	# x-release-please-start-version
 	test -f "$LIX_STORE_FILE" ||
 		gh release download "v0.3.0" \
-			--output "$LIX_STORE_FILE" \
-			--pattern "$LIX_STORE_FILE" \
+			--output "${LIX_STORE_FILE##*/}" \
+			--pattern "${LIX_STORE_FILE##*/}" \
 			--repo "$GITHUB_ACTION_REPOSITORY"
 	# x-release-please-end
 	gh attestation verify "$LIX_STORE_FILE" --{,signer-}repo="$GITHUB_ACTION_REPOSITORY"
 	rm -rf "/nix/var/gha"
 	test "$RUNNER_OS" != macOS && tar=tar || tar=gtar
 	$tar --auto-compress --extract --skip-old-files --directory /nix --strip-components 1 <"$LIX_STORE_FILE"
-	popd
 }
 endgroup
 
@@ -73,10 +71,9 @@ group 'Synthesize nix.conf'
 accept-flake-config = true
 access-tokens = ${GITHUB_SERVER_URL#*://}=$GITHUB_TOKEN
 experimental-features = nix-command flakes
-${NIX_CONF:+"include $XDG_CONFIG_HOME/nix/$GITHUB_REPOSITORY_ID.conf"}
+include $XDG_CONFIG_HOME/nix/$GITHUB_REPOSITORY_ID.conf
 EOF
-	test -z "${NIX_CONF:-}" ||
-		tee "$XDG_CONFIG_HOME/nix/$GITHUB_REPOSITORY_ID.conf" <<<"$NIX_CONF"
+	tee "$XDG_CONFIG_HOME/nix/$GITHUB_REPOSITORY_ID.conf" <<<"$NIX_CONF"
 }
 endgroup
 
