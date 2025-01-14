@@ -35,7 +35,7 @@ inputs:
       Configure Lix to use the specified token when fetching from GitHub.
       Defaults to `github.token`.
     default: ${{ github.token }}
-  lix-stores-dir:
+  lix-store-dir:
     description: |
       Internal.
     default: ${{ runner.temp }}

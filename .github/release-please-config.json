@@ -6,6 +6,12 @@
       "exclude-paths": [
         ".github"
       ],
+      "extra-files": [
+        {
+          "type": "generic",
+          "path": "action.yaml"
+        }
+      ],
       "release-type": "simple",
       "version-file": "VERSION"
     }

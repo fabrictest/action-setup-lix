@@ -35,7 +35,7 @@ jobs:
         uses: ./
         with:
           lix-version: ${{ matrix.build.lix-version }}
-          lix-stores-dir: ${{ steps.lix-stores.outputs.download-path }}
+          lix-store-dir: ${{ steps.lix-stores.outputs.download-path }}
           lix-on-tmpfs: true
       - name: Set up Cachix
         uses: cachix/cachix-action@ad2ddac53f961de1989924296a1f236fcfbaa4fc # v15
@@ -78,7 +78,7 @@ jobs:
         uses: ./
         with:
           lix-version: ${{ matrix.build.lix-version }}
-          lix-stores-dir: ${{ steps.lix-stores.outputs.download-path }}
+          lix-store-dir: ${{ steps.lix-stores.outputs.download-path }}
       - name: Set up Nix binary cache
         uses: DeterminateSystems/magic-nix-cache-action@87b14cf437d03d37989d87f0fa5ce4f5dc1a330b # v8
         with:
