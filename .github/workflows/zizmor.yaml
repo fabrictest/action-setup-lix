@@ -5,10 +5,13 @@ on:
     paths:
       - ".github/workflows/**.yaml"
       - "**/action.yaml"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   scan:
     name: Scan workflows and actions
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
@@ -18,9 +21,9 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
-      - name: Run zizmor
+      - name: Scan workflows and actions
         run: |
-          env GH_HOST="${GITHUB_SERVER_URL#*://}" pipx run -- zizmor --quiet --format=sarif --persona=pedantic . >zizmor.sarif
+          pipx run -- zizmor --quiet --format=sarif --gh-hostname="${GITHUB_SERVER_URL#*://}" --persona=pedantic . >results.sarif
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -29,4 +32,4 @@ jobs:
         uses: github/codeql-action/upload-sarif@b6a472f63d85b9c78a3ac5e89422239fc15e9b3c # v3.28.1
         with:
           category: zizmor
-          sarif_file: zizmor.sarif
+          sarif_file: results.sarif

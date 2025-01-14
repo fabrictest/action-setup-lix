@@ -55,8 +55,8 @@ group 'Install Lix store'
 			--output "${LIX_STORE_FILE##*/}" \
 			--pattern "${LIX_STORE_FILE##*/}" \
 			--repo "$GITHUB_ACTION_REPOSITORY"
-	gh attestation verify "$LIX_STORE_FILE" --{,signer-}repo="$GITHUB_ACTION_REPOSITORY"
-	rm -rf "/nix/var/gha"
+	time gh attestation verify "$LIX_STORE_FILE" --{,signer-}repo="$GITHUB_ACTION_REPOSITORY"
+	rm -rf /nix/var/gha
 	test "$RUNNER_OS" != macOS && tar=tar || tar=gtar
 	$tar --auto-compress --extract --skip-old-files --directory /nix --strip-components 1 <"$LIX_STORE_FILE"
 }

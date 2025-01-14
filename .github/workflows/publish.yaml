@@ -10,7 +10,7 @@ on:
 jobs:
   release:
     name: Release
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     outputs:
       go: ${{ steps.release.outputs.release_created }}
       tag: ${{ steps.release.outputs.tag_name }}
@@ -35,7 +35,7 @@ jobs:
     needs:
       - release
     if: ${{ needs.release.outputs.go }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: write
@@ -67,9 +67,8 @@ jobs:
     name: Pull request
     needs:
       - release
-      - lix-stores
     if: ${{ needs.release.outputs.go }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:

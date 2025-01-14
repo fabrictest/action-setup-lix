@@ -4,8 +4,7 @@
   "packages": {
     ".": {
       "exclude-paths": [
-        ".github",
-        "examples"
+        ".github"
       ],
       "release-type": "simple",
       "version-file": "VERSION"
