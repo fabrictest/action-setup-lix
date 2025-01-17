@@ -1,90 +1,90 @@
 ---
 name: Publish
 on:
-  workflow_call:
-    secrets:
-      RELEASE_PLEASE_PRIVATE_KEY:
-        description: |
-          Private key of the GitHub app used with the release-please action.
-        required: true
-jobs:
   release:
-    name: Release
-    runs-on: ubuntu-latest
-    outputs:
-      go: ${{ steps.release.outputs.release_created }}
-      tag: ${{ steps.release.outputs.tag_name }}
-      commit: ${{ steps.release.outputs.sha }}
-    steps:
-      - name: Generate app token
-        id: app-token
-        uses: actions/create-github-app-token@c1a285145b9d317df6ced56c09f525b5c2b6f755 # v1.11.1
-        with:
-          app-id: ${{ vars.RELEASE_PLEASE_APP_ID }}
-          private-key: ${{ secrets.RELEASE_PLEASE_PRIVATE_KEY }}
-      - name: Cut release
-        id: release
-        uses: googleapis/release-please-action@7987652d64b4581673a76e33ad5e98e3dd56832f # v4.1.3
-        with:
-          token: ${{ steps.app-token.outputs.token }}
-          config-file: .github/release-please-config.json
-          manifest-file: .github/release-please-manifest.json
-          target-branch: ${{ github.ref_name }}
+    types:
+      - published
+jobs:
   lix-stores:
     name: Lix stores
-    needs:
-      - release
-    if: ${{ needs.release.outputs.go }}
     runs-on: ubuntu-latest
     permissions:
+      pull-requests: read
       actions: read
       contents: write
     steps:
-      - name: Download tarballs
+      - name: Retrieve release PR \#
+        id: pr
+        run: |
+          tee -a "$GITHUB_OUTPUT" <<EOF
+          number=$(
+            jq --raw-output .release.tag_name "$GITHUB_EVENT_PATH" |
+              xargs -I '{}' -- gh pr list \
+                --repo="$GITHUB_REPOSITORY" \
+                --search='{} is:merged label:"autorelease: tagged" sort:created-desc' \
+                --limit 1 \
+                --json number \
+                --jq '.[0].number'
+          )
+          EOF
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Download Lix stores
         id: lix-stores
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        if: ${{ steps.pr.outputs.number }}
+        uses: dawidd6/action-download-artifact@v7
         with:
-          pattern: lix-stores-*
-          merge-multiple: true
-      - name: Verify tarball integrity
+          github_token: ${{ github.token }}
+          name: "^lix-stores-.*"
+          name_is_regexp: true
+          path: ${{ runner.temp }}
+          pr: ${{ steps.pr.outputs.number }}
+          search_artifacts: true
+      - name: Verify integrity of Lix stores
+        if: ${{ steps.lix-stores.outputs.found_artifact }}
         run: |
-          for f in "$download_path"/lix-*.tar.*; do
-            gh attestation verify "$f" --{,signer-}repo="$GITHUB_REPOSITORY"
-          done
+          find -L . \
+              -type f \
+              -name 'lix-*.tar.*' \
+              -exec gh attestation verify '{}' --{,signer-}repo="$GITHUB_REPOSITORY" \;
         shell: bash
+        working-directory: ${{ runner.temp }}
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-          download_path: ${{ steps.lix-stores.outputs.download-path }}
+          GH_TOKEN: ${{ github.token }}
       - name: Attach Lix stores to the GitHub release
+        if: ${{ steps.lix-stores.outputs.found_artifact }}
         run: |
-          gh release upload "$tag" "$download_path"/lix-*.tar.* --repo="$GITHUB_REPOSITORY"
+          jq --raw-output .release.tag_name "$GITHUB_EVENT_PATH" |
+            xargs -I '[]' -- find -L . \
+              -type f \
+              -name 'lix-*.tar.*' \
+              -exec gh release upload '[]' '{}' --repo="$GITHUB_REPOSITORY" \+
         shell: bash
+        working-directory: ${{ runner.temp }}
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-          download_path: ${{ steps.lix-stores.outputs.download-path }}
-          tag: ${{ needs.release.outputs.tag }}
-  pull-request:
+          GH_TOKEN: ${{ github.token }}
+  pr:
     name: Pull request
     needs:
-      - release
-    if: ${{ needs.release.outputs.go }}
+      - lix-stores
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:
       - name: Mark release PR as published
         run: |
-          gh pr list \
+          jq --raw-output .release.tag_name "$GITHUB_EVENT_PATH" |
+            xargs -I {} -- gh pr list \
               --repo="$GITHUB_REPOSITORY" \
-              --search="$commit"' is:merged label:"autorelease: tagged" sort:created-desc' \
+              --search='{} is:merged label:"autorelease: tagged" sort:created-desc' \
               --limit 1 \
               --json number \
               --jq '.[0].number' |
-            xargs -I{} -- gh pr edit {} \
+            xargs -I {} -- gh pr edit {} \
               --add-label='autorelease: published' \
               --remove-label='autorelease: tagged' \
               --repo="$GITHUB_REPOSITORY"
         shell: bash
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-          commit: ${{ needs.release.outputs.commit }}
+          GH_TOKEN: ${{ github.token }}

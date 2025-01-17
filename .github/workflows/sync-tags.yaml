@@ -28,5 +28,5 @@ jobs:
           done
         shell: bash
         env:
-          GITHUB_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}

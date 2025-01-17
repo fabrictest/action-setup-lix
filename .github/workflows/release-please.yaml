@@ -3,10 +3,13 @@ name: Release Please
 on:
   push:
     branches:
-      - TODO
+      - main
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   release:
-    name: Release project
+    name: Release
     runs-on: ubuntu-latest
     steps:
       - name: Generate app token

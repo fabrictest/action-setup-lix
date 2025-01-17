@@ -23,7 +23,7 @@ jobs:
           persist-credentials: false
       - name: Scan workflows and actions
         run: |
-          pipx run -- zizmor --quiet --format=sarif --gh-hostname="${GITHUB_SERVER_URL#*://}" --persona=pedantic . >results.sarif
+          pipx run --quiet -- zizmor --quiet --format=sarif --gh-hostname="${GITHUB_SERVER_URL#*://}" --persona=auditor . >results.sarif
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
