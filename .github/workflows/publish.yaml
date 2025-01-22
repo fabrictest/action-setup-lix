@@ -33,7 +33,7 @@ jobs:
       - name: Download Lix stores
         id: lix-stores
         if: ${{ steps.pr.outputs.number }}
-        uses: dawidd6/action-download-artifact@v7
+        uses: dawidd6/action-download-artifact@80620a5d27ce0ae443b965134db88467fc607b43 # v7
         with:
           github_token: ${{ github.token }}
           name: "^lix-stores-.*"
