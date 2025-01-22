@@ -1,9 +1,10 @@
 ---
 name: Release Please
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    types:
+      - completed
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

@@ -11,7 +11,5 @@ in
     nixago = l.attrValues {
       inherit (cell.settings) editorconfig githubsettings treefmt;
     };
-
-    packages = [ pkgs.yq ];
   };
 }

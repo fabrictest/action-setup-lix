@@ -64,10 +64,39 @@ jobs:
         working-directory: ${{ runner.temp }}
         env:
           GH_TOKEN: ${{ github.token }}
+  tag-sync:
+    name: Tag sync
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Sync tags
+        run: |
+
+          TODO TODO TODO GITHUB_SHA TODO TODO TODO
+
+          source=$(jq --raw-output .release.tag_name "$GITHUB_EVENT_PATH")
+          for target in "${source%%.*}" "${source%.*}"; do
+            gh api repos/{owner}/{repo}/git/tags \
+                --raw-field tag="$target" \
+                --raw-field message="Release $target → $source" \
+                --raw-field object="$GITHUB_SHA" \
+                --raw-field type=commit \
+                --template 'sha={{.sha}}' |
+              xargs -- gh api repos/{owner}/{repo}/git/refs \
+                --raw-field ref=refs/tags/"$target" \
+                --raw-field |
+              jq .
+          done
+        shell: bash
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
   pr:
     name: Pull request
     needs:
       - lix-stores
+      - tag-sync
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
