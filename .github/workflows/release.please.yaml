@@ -3,7 +3,7 @@ name: Release / Please
 on:
   workflow_run:
     workflows:
-      - Build
+      - Build / Lix
     types:
       - completed
     branches:

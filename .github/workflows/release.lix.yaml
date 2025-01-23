@@ -1,53 +1,47 @@
 ---
-name: Publish
+name: Release / Lix
 on:
   release:
     types:
       - published
 jobs:
-  lix-stores:
-    name: Lix stores
+  attach-lix-stores:
+    name: Attach Lix stores to GitHub release
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: write
       pull-requests: read
     steps:
-      - name: Retrieve release PR \#
-        id: pr
+      - name: Retrieve release commit
+        id: release
         run: |
           tee -a "$GITHUB_OUTPUT" <<EOF
-          number=$(
+          commit=$(
             jq --raw-output .release.tag_name "$GITHUB_EVENT_PATH" |
-              xargs -I '{}' -- gh pr list \
-                --repo="$GITHUB_REPOSITORY" \
-                --search='{} is:merged label:"autorelease: tagged" sort:created-desc' \
-                --limit 1 \
-                --json number \
-                --jq '.[0].number'
+              xargs -I{} -- gh api /repos/{owner}/{repo}/git/ref/tags/{} --jq '.object.sha' |
+              xargs -I{} -- gh api /repos/{owner}/{repo}/git/tags/{} --jq '.object.sha'
           )
           EOF
         shell: bash
         env:
+          GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
       - name: Download Lix stores
         id: lix-stores
-        if: ${{ steps.pr.outputs.number }}
+        if: ${{ steps.release.outputs.commit }}
         uses: dawidd6/action-download-artifact@80620a5d27ce0ae443b965134db88467fc607b43 # v7
         with:
           github_token: ${{ github.token }}
           name: "^lix-stores-.*"
           name_is_regexp: true
           path: ${{ runner.temp }}
-          pr: ${{ steps.pr.outputs.number }}
+          commit: ${{ steps.release.outputs.commit }}
           search_artifacts: true
       - name: Verify integrity of Lix stores
         if: ${{ steps.lix-stores.outputs.found_artifact }}
         run: |
-          find -L . \
-              -type f \
-              -name 'lix-*.tar.*' \
-              -exec gh attestation verify '{}' --{,signer-}repo="$GITHUB_REPOSITORY" \;
+          find -L . -type f -name 'lix-*.tar.*' -exec gh attestation verify '{}' --{,signer-}repo="$GITHUB_REPOSITORY" \;
         shell: bash
         working-directory: ${{ runner.temp }}
         env:
@@ -56,34 +50,28 @@ jobs:
         if: ${{ steps.lix-stores.outputs.found_artifact }}
         run: |
           jq --raw-output .release.tag_name "$GITHUB_EVENT_PATH" |
-            xargs -I '[]' -- find -L . \
-              -type f \
-              -name 'lix-*.tar.*' \
-              -exec gh release upload '[]' '{}' --repo="$GITHUB_REPOSITORY" \+
+            xargs -I '[]' -- find -L . -type f -name 'lix-*.tar.*' -exec gh release upload '[]' '{}' --repo="$GITHUB_REPOSITORY" +
         shell: bash
         working-directory: ${{ runner.temp }}
         env:
           GH_TOKEN: ${{ github.token }}
-  tag-sync:
-    name: Tag sync
+  sync-tags:
+    name: Sync tags
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - name: Sync tags
         run: |
-
-          TODO TODO TODO GITHUB_SHA TODO TODO TODO
-
           source=$(jq --raw-output .release.tag_name "$GITHUB_EVENT_PATH")
           for target in "${source%%.*}" "${source%.*}"; do
-            gh api repos/{owner}/{repo}/git/tags \
+            gh api /repos/{owner}/{repo}/git/tags \
                 --raw-field tag="$target" \
                 --raw-field message="Release $target → $source" \
                 --raw-field object="$GITHUB_SHA" \
                 --raw-field type=commit \
                 --template 'sha={{.sha}}' |
-              xargs -- gh api repos/{owner}/{repo}/git/refs \
+              xargs -- gh api /repos/{owner}/{repo}/git/refs \
                 --raw-field ref=refs/tags/"$target" \
                 --raw-field |
               jq .
@@ -95,8 +83,8 @@ jobs:
   pr:
     name: Pull request
     needs:
-      - lix-stores
-      - tag-sync
+      - attach-lix-stores
+      - sync-tags
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
