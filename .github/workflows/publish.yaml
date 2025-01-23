@@ -9,9 +9,9 @@ jobs:
     name: Lix stores
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: read
       actions: read
       contents: write
+      pull-requests: read
     steps:
       - name: Retrieve release PR \#
         id: pr
