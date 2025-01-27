@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/fabrictest/action-setup-lix/compare/v0.5.0...v0.5.1) (2025-01-27)
+
+
+### Bug Fixes
+
+* Release workflow ([913a3b2](https://github.com/fabrictest/action-setup-lix/commit/913a3b2c3d9c98e58d30f628ed165cbeed03d760))
+
 ## [0.5.0](https://github.com/fabrictest/action-setup-lix/compare/v0.4.0...v0.5.0) (2025-01-27)
 
 
