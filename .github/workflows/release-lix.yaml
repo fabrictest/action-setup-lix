@@ -19,8 +19,7 @@ jobs:
           tee -a "$GITHUB_OUTPUT" <<EOF
           commit=$(
             jq --raw-output .release.tag_name "$GITHUB_EVENT_PATH" |
-              xargs -I{} -- gh api /repos/{owner}/{repo}/git/ref/tags/{} --jq '.object.sha' |
-              xargs -I{} -- gh api /repos/{owner}/{repo}/git/tags/{} --jq '.object.sha'
+              xargs -I{} -- gh api /repos/{owner}/{repo}/git/ref/tags/{} --jq '.object.sha'
           )
           EOF
         shell: bash
