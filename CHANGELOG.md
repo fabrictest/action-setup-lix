@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.4.0](https://github.com/fabrictest/action-setup-lix/compare/v0.3.0...v0.4.0) (2025-01-27)
+
+
+### Features
+
+* Get version from VERSION file ([ad1226a](https://github.com/fabrictest/action-setup-lix/commit/ad1226aa80395fcba3fdbe27b48f3c2496cbb8f3))
+* More broken code ([fc6b74d](https://github.com/fabrictest/action-setup-lix/commit/fc6b74d197ca28e1321d2a597f72860ffd2a2a84))
+* More stuff ([e19d428](https://github.com/fabrictest/action-setup-lix/commit/e19d42804ecee03cbd1edc30fe4e84e6e7dcbe0d))
+* Simplify moar ([b8b2a03](https://github.com/fabrictest/action-setup-lix/commit/b8b2a039b764f2443c67dfb6fc609fe0e358800c))
+* Wat ([71bdc26](https://github.com/fabrictest/action-setup-lix/commit/71bdc2617f5e2193bc041bfb0e6622b2c34768f6))
+* **wip:** Sending broken code ([8540711](https://github.com/fabrictest/action-setup-lix/commit/854071143c6aea4260ca81ad0b013f7d6b4295e4))
+
+
+### Bug Fixes
+
+* Lix-store-dir ([d017455](https://github.com/fabrictest/action-setup-lix/commit/d01745595ae7b975f4d7835ce9c7551fa0cc7303))
+* Update repository settings ([d31882e](https://github.com/fabrictest/action-setup-lix/commit/d31882e2a5b21681f6b66cf17799e198b859c588))
+
 ## [0.3.0](https://github.com/fabrictest/action-setup-lix/compare/v0.2.0...v0.3.0) (2025-01-02)
 
 
