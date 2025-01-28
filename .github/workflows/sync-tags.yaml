@@ -15,16 +15,20 @@ jobs:
       - name: Sync tags
         run: |
           for target in "${GITHUB_REF_NAME%%.*}" "${GITHUB_REF_NAME%.*}"; do
-            gh api repos/{owner}/{repo}/git/tags \
+            sha=$(
+              gh api repos/{owner}/{repo}/git/tags \
                 --raw-field tag="$target" \
                 --raw-field message="Release $target → $GITHUB_REF_NAME" \
                 --raw-field object="$GITHUB_SHA" \
                 --raw-field type=commit \
-                --template 'sha={{.sha}}' |
-              xargs -- gh api repos/{owner}/{repo}/git/refs \
+                --template '{{.sha}}'
+            )
+            gh api repos/{owner}/{repo}/git/refs/"$target" \
+                --raw-field sha="$sha" \
+                --raw-field force=true ||
+              gh api repos/{owner}/{repo}/git/refs \
                 --raw-field ref=refs/tags/"$target" \
-                --raw-field |
-              jq .
+                --raw-field sha="$sha"
           done
         shell: bash
         env:
