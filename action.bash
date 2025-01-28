@@ -3,9 +3,11 @@ set -euo pipefail
 
 group() {
 	printf "::group::%s\n" "$*"
+	set -x
 }
 
 endgroup() {
+	set +x
 	printf "::endgroup::\n"
 }
 
