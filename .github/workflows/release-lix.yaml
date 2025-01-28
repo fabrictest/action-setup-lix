@@ -41,22 +41,20 @@ jobs:
       - name: Verify integrity of Lix stores
         if: ${{ steps.lix-stores.outputs.found_artifact }}
         run: |
-          find -L . -type f -name 'lix-*.tar.*' -exec gh attestation verify '{}' --signer-repo="$GH_REPO" \;
+          find -L . -type f -name 'lix-*.tar.*' -exec gh attestation verify --{,signer-}repo="$GITHUB_REPOSITORY" '{}' \;
         shell: bash
         working-directory: ${{ runner.temp }}
         env:
-          GH_REPO: ${{ github.repository }}
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Attach Lix stores to the GitHub release
         if: ${{ steps.lix-stores.outputs.found_artifact }}
         run: |
           jq --raw-output .release.tag_name "$GITHUB_EVENT_PATH" |
-            xargs -I '[]' -- find -L . -type f -name 'lix-*.tar.*' -exec gh release upload '[]' '{}' +
+            xargs -I '[]' -- find -L . -type f -name 'lix-*.tar.*' -exec gh release upload --repository="$GITHUB_REPOSITORY" '[]' '{}' +
         shell: bash
         working-directory: ${{ runner.temp }}
         env:
-          GH_REPO: ${{ github.repository }}
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
   pr:
     name: Pull request
     needs:
