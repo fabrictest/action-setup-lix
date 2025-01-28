@@ -32,7 +32,7 @@ jobs:
         uses: dawidd6/action-download-artifact@20319c5641d495c8a52e688b7dc5fada6c3a9fbc # v8
         with:
           github_token: ${{ github.token }}
-          workflow: build-lix.yaml
+          workflow_search: true
           name: "^lix-stores-.*"
           name_is_regexp: true
           path: ${{ runner.temp }}
@@ -57,36 +57,10 @@ jobs:
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
-  sync-tags:
-    name: Sync tags
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Sync tags
-        run: |
-          source=$(jq --raw-output .release.tag_name "$GITHUB_EVENT_PATH")
-          for target in "${source%%.*}" "${source%.*}"; do
-            gh api /repos/{owner}/{repo}/git/tags \
-                --raw-field tag="$target" \
-                --raw-field message="Release $target → $source" \
-                --raw-field object="$GITHUB_SHA" \
-                --raw-field type=commit \
-                --template 'sha={{.sha}}' |
-              xargs -- gh api /repos/{owner}/{repo}/git/refs \
-                --raw-field ref=refs/tags/"$target" \
-                --raw-field |
-              jq .
-          done
-        shell: bash
-        env:
-          GH_REPO: ${{ github.repository }}
-          GH_TOKEN: ${{ github.token }}
   pr:
     name: Pull request
     needs:
       - attach-lix-stores
-      - sync-tags
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
