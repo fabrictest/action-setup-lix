@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.0](https://github.com/fabrictest/action-setup-lix/compare/v0.5.1...v0.6.0) (2025-01-28)
+
+
+### Features
+
+* Output bash commands in log group ([69f3696](https://github.com/fabrictest/action-setup-lix/commit/69f36960987fc8d5ea1e0161a89a2adda77b0de0))
+
+
+### Bug Fixes
+
+* Extract sync-tags workflow ([15c38a7](https://github.com/fabrictest/action-setup-lix/commit/15c38a7ed2e83cdc928a403b76e927fcac86d5c1))
+* Release workflow, part 2 ([92fe632](https://github.com/fabrictest/action-setup-lix/commit/92fe6328fb3368b2070766928d9de8a979d119ff))
+* Signer repository ([d67532c](https://github.com/fabrictest/action-setup-lix/commit/d67532cecad9514bc7d69374130c26a034143672))
+
 ## [0.5.1](https://github.com/fabrictest/action-setup-lix/compare/v0.5.0...v0.5.1) (2025-01-27)
 
 
