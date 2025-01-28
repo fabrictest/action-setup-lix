@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.3](https://github.com/fabrictest/action-setup-lix/compare/v0.8.2...v0.8.3) (2025-01-28)
+
+
+### Bug Fixes
+
+* Fucking hell ([01199c1](https://github.com/fabrictest/action-setup-lix/commit/01199c19df0a4dc99bbad1f79ad02f0485f5f48f))
+
 ## [0.8.2](https://github.com/fabrictest/action-setup-lix/compare/v0.8.1...v0.8.2) (2025-01-28)
 
 
