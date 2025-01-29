@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.4](https://github.com/fabrictest/action-setup-lix/compare/v0.8.3...v0.8.4) (2025-01-29)
+
+
+### Bug Fixes
+
+* Update sync-tags.yaml ([1b49ddb](https://github.com/fabrictest/action-setup-lix/commit/1b49ddb70f9e859eb14bd353ac1fd6bc0efa137a))
+
 ## [0.8.3](https://github.com/fabrictest/action-setup-lix/compare/v0.8.2...v0.8.3) (2025-01-28)
 
 
