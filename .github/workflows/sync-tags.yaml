@@ -14,6 +14,7 @@ jobs:
     steps:
       - name: Sync tags
         run: |
+          set -x
           for target in "${GITHUB_REF_NAME%%.*}" "${GITHUB_REF_NAME%.*}"; do
             sha=$(
               gh api repos/{owner}/{repo}/git/tags \
