@@ -24,7 +24,7 @@ jobs:
                 --raw-field type=commit \
                 --template '{{.sha}}'
             )
-            gh api repos/{owner}/{repo}/git/refs/refs/tags/"$target" \
+            gh api -X PATCH repos/{owner}/{repo}/git/refs/refs/tags/"$target" \
                 --raw-field sha="$sha" \
                 --field force=true ||
               gh api repos/{owner}/{repo}/git/refs \
