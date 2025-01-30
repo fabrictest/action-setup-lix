@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.9.0](https://github.com/fabrictest/action-setup-lix/compare/v0.8.5...v0.9.0) (2025-01-30)
+
+
+### Features
+
+* Change stuff ([68f1ce8](https://github.com/fabrictest/action-setup-lix/commit/68f1ce8fe231266312f6df427ad520344d47341e))
+
+
+### Bug Fixes
+
+* Sync-tag workflow ([763ec51](https://github.com/fabrictest/action-setup-lix/commit/763ec516fd61b27886fa79762b581c1fbc232110))
+
 ## [0.8.5](https://github.com/fabrictest/action-setup-lix/compare/v0.8.4...v0.8.5) (2025-01-29)
 
 
