@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/fabrictest/action-setup-lix/compare/v0.9.0...v0.9.1) (2025-01-30)
+
+
+### Bug Fixes
+
+* Silence expected error ([41f28ab](https://github.com/fabrictest/action-setup-lix/commit/41f28ab3d444799012096b5c7b0ed245e4400cb0))
+
 ## [0.9.0](https://github.com/fabrictest/action-setup-lix/compare/v0.8.5...v0.9.0) (2025-01-30)
 
 
