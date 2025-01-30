@@ -47,7 +47,7 @@ runs:
       run: ./action.bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
-        LIX_ON_DISK: ${{ inputs.lix-on-tmpfs != 'true' }}
+        LIX_ON_TMPFS: ${{ inputs.lix-on-tmpfs == 'true' }}
         LIX_STORE_FILE: >-
           ${{
             format('{0}/lix-{1}-{2}-{3}.tar.zstd',

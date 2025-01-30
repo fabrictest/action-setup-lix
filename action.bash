@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-group() {
+test "${RUNNER_DEBUG:-}" != 1 || set -x
+
+function group {
 	printf "::group::%s\n" "$*"
-	set -x
 }
 
-endgroup() {
-	set +x
+function endgroup {
 	printf "::endgroup::\n"
 }
 
-die() {
+function die {
 	printf "::error::%s\n" "$*"
 	exit 1
 }
@@ -31,7 +31,8 @@ group 'Mount /nix'
 	test -e /nix || case "$RUNNER_OS" in
 	Linux)
 		sudo install -d -o "$USER" /nix
-		$LIX_ON_DISK || sudo mount -t tmpfs -o "size=90%,mode=0755,uid=$UID,gid=$(id -g)" tmpfs /nix
+		"$LIX_ON_TMPFS" &&
+			sudo mount -t tmpfs -o "size=90%,mode=0755,uid=$UID,gid=$(id -g)" tmpfs /nix || :
 		;;
 	macOS)
 		sudo tee -a /etc/synthetic.conf <<<$'nix\nrun\tprivate/var/run\n'
@@ -57,7 +58,7 @@ group 'Install Lix store'
 			--output "${LIX_STORE_FILE##*/}" \
 			--pattern "${LIX_STORE_FILE##*/}" \
 			--repo "$GITHUB_ACTION_REPOSITORY"
-	time gh attestation verify "$LIX_STORE_FILE" --{,signer-}repo="$GITHUB_ACTION_REPOSITORY"
+	gh attestation verify "$LIX_STORE_FILE" --{,signer-}repo="$GITHUB_ACTION_REPOSITORY"
 	rm -rf /nix/var/gha
 	test "$RUNNER_OS" != macOS && tar=tar || tar=gtar
 	$tar --auto-compress --extract --skip-old-files --directory /nix --strip-components 1 <"$LIX_STORE_FILE"
@@ -71,9 +72,9 @@ group 'Synthesize nix.conf'
 accept-flake-config = true
 access-tokens = ${GITHUB_SERVER_URL#*://}=$GITHUB_TOKEN
 experimental-features = nix-command flakes
-include $XDG_CONFIG_HOME/nix/$GITHUB_REPOSITORY_ID.conf
+include $XDG_CONFIG_HOME/nix/${GITHUB_REPOSITORY//\//_}.conf
 EOF
-	tee "$XDG_CONFIG_HOME/nix/$GITHUB_REPOSITORY_ID.conf" <<<"$NIX_CONF"
+	tee "$XDG_CONFIG_HOME/nix/${GITHUB_REPOSITORY//\//_}.conf" <<<"$NIX_CONF"
 }
 endgroup
 
