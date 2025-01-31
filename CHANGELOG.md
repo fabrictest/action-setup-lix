@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.11.0](https://github.com/fabrictest/action-setup-lix/compare/v0.10.0...v0.11.0) (2025-01-31)
+
+
+### Features
+
+* Remove stuff ([e752bbd](https://github.com/fabrictest/action-setup-lix/commit/e752bbdb5493b156ce4652eeba7aa96b4bf865e2))
+
+
+### Bug Fixes
+
+* Ci ([eb1054d](https://github.com/fabrictest/action-setup-lix/commit/eb1054dcc55800e2a842f9d7b1518281ada2f817))
+* GH_ACTION_REPOSITORY ([8416be9](https://github.com/fabrictest/action-setup-lix/commit/8416be97933793c55a3aea54be39f0906017eb9a))
+* Runner.debug ([d02339f](https://github.com/fabrictest/action-setup-lix/commit/d02339f0d44897099dfa5f201e521221545929d7))
+
 ## [0.10.0](https://github.com/fabrictest/action-setup-lix/compare/v0.9.1...v0.10.0) (2025-01-31)
 
 
