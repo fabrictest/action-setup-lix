@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+test -z "${RUNNER_DEBUG:-}" || set -x
+
 function group {
 	printf "::group::%s\n" "$*"
 }
