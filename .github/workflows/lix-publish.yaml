@@ -32,6 +32,7 @@ jobs:
         with:
           github_token: ${{ github.token }}
           workflow_search: true
+          path: ${{ runner.temp }}
           name: ^lix-stores-
           name_is_regexp: true
           commit: ${{ steps.release.outputs.sha }}
@@ -39,17 +40,19 @@ jobs:
       - name: Verify integrity of Lix stores
         if: ${{ steps.lix-stores.outputs.found_artifact }}
         run: |
-          for f in lix-*.tar.*; do
+          for f in lix-stores/lix-*.tar.*; do
             gh attestation verify "$f" --{,signer-}repo="$GITHUB_REPOSITORY"
           done
         shell: bash
+        working-directory: ${{ runner.temp }}
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Attach Lix stores to the GitHub release
         if: ${{ steps.lix-stores.outputs.found_artifact }}
         run: |
-          gh release upload "$tag" lix-*.tar.*
+          gh release upload "$tag" lix-stores-*/lix-*.tar.*
         shell: bash
+        working-directory: ${{ runner.temp }}
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
