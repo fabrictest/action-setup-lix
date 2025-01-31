@@ -175,7 +175,12 @@ std.lib.dev.mkNixago std.lib.cfg.treefmt {
       # https://docs.rubocop.org
       rubocop = {
         command = l.getExe pkgs.rubocop;
-        includes = [ "*Brewfile" ];
+        options = l.cli.toGNUCommandLine { } {
+          auto-correct-all = true;
+        };
+        includes = [
+          "*Brewfile"
+        ];
       };
     };
 

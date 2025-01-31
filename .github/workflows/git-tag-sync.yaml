@@ -1,5 +1,5 @@
 ---
-name: Sync tags
+name: Git tag sync
 on:
   push:
     tags:
@@ -12,11 +12,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Sync tags
+      - name: Synchronize tags
         run: |
-          :
           for tag in "${GITHUB_REF_NAME%.*}" "${GITHUB_REF_NAME%%.*}"; do
-            sha=$(gh api repos/{owner}/{repo}/git/tags \
+            sha=$(
+              gh api repos/{owner}/{repo}/git/tags \
                 -f tag="$tag" -f message="$GITHUB_REF_NAME" -f object="$GITHUB_SHA" -f type=commit -q .sha)
             gh api -X PATCH repos/{owner}/{repo}/git/refs/tags/"$tag" -f sha="$sha" >/dev/null 2>&1 ||
               gh api repos/{owner}/{repo}/git/refs -f ref=refs/tags/"$tag" -f sha="$sha" >/dev/null

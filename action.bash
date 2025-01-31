@@ -21,6 +21,8 @@ group 'Preflight checks'
 	test ! -e /nix -o -w /nix ||
 		die "failed to set up Lix: /nix exists but isn't writable"
 
+	# FIXME(eff): The command below doesn't work as intended when used in
+	#  other repositories.
 	: "${GITHUB_ACTION_REPOSITORY:="$GITHUB_REPOSITORY"}"
 	: "${XDG_CONFIG_HOME:="$HOME/.config"}"
 }
@@ -31,11 +33,11 @@ group 'Mount /nix'
 	test -e /nix || case "$RUNNER_OS" in
 	Linux)
 		sudo install -d -o "$USER" /nix
-		"$LIX_ON_TMPFS" &&
-			sudo mount -t tmpfs -o "size=90%,mode=0755,uid=$UID,gid=$(id -g)" tmpfs /nix || :
+		! "$LIX_ON_TMPFS" ||
+			sudo mount -t tmpfs -o "size=90%,mode=0755,uid=$UID,gid=$(id -g)" tmpfs /nix
 		;;
 	macOS)
-		sudo tee -a /etc/synthetic.conf <<<$'nix\nrun\tprivate/var/run\n'
+		sudo tee -a /etc/synthetic.conf <<<$'nix\nrun\tprivate/var/run\n' >/dev/null
 		sudo /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || :
 		test -L /run || die "failed to set up Lix: apfs.util couldn't symlink /run"
 		stat -f %Sd / |
@@ -54,7 +56,7 @@ endgroup
 group 'Install Lix store'
 {
 	test -f "$LIX_STORE_FILE" ||
-		gh release download "v$(cat "$GITHUB_ACTION_PATH/VERSION")" \
+		gh release download v"$(cat "$GITHUB_ACTION_PATH"/VERSION)" \
 			--output "${LIX_STORE_FILE##*/}" \
 			--pattern "${LIX_STORE_FILE##*/}" \
 			--repo "$GITHUB_ACTION_REPOSITORY"
@@ -67,14 +69,14 @@ endgroup
 
 group 'Synthesize nix.conf'
 {
-	mkdir -p "$XDG_CONFIG_HOME/nix"
-	tee -a "$XDG_CONFIG_HOME/nix/nix.conf" <<EOF
+	mkdir -p "$XDG_CONFIG_HOME"/nix
+	cat <<EOF >>"$XDG_CONFIG_HOME"/nix/nix.conf
 accept-flake-config = true
 access-tokens = ${GITHUB_SERVER_URL#*://}=$GITHUB_TOKEN
 experimental-features = nix-command flakes
 include $XDG_CONFIG_HOME/nix/${GITHUB_REPOSITORY//\//_}.conf
 EOF
-	tee "$XDG_CONFIG_HOME/nix/${GITHUB_REPOSITORY//\//_}.conf" <<<"$NIX_CONF"
+	cat <<<"$NIX_CONF" >"$XDG_CONFIG_HOME"/nix/"${GITHUB_REPOSITORY//\//_}".conf
 }
 endgroup
 
@@ -87,7 +89,7 @@ group 'Install Lix'
 	test -n "${NIX_SSL_CERT_FILE:-}" -o ! -e /etc/ssl/cert.pem ||
 		NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
 	./bin/nix-env --install "$PWD"
-	tee -a "$GITHUB_PATH" <<<"$HOME/.nix-profile/bin"
+	tee -a "$GITHUB_PATH" <<<"$HOME"/.nix-profile/bin
 	tee -a "$GITHUB_ENV" <<EOF
 NIX_PROFILES=/nix/var/nix/profiles/default $HOME/.nix-profile
 NIX_USER_PROFILE_DIR=/nix/var/nix/profiles/per-user/$USER

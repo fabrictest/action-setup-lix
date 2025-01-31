@@ -1,5 +1,5 @@
 ---
-name: Build / Lix
+name: Lix
 on:
   pull_request:
     types:
@@ -59,8 +59,8 @@ jobs:
         run: |
           printf %s\\n result/lix-*.tar.* |
             cut -d- -f2 |
-            jq --compact-output --raw-input --arg runs-on "$runs_on" \
-              '{"lix-version": .} + $ARGS.named' >build-matrix-"$runs_on".ndjson
+            jq -Rc --arg runs-on "$runs_on" \
+              '{version: .} + $ARGS.named' >build-matrix-"$runs_on".ndjson
         shell: bash
         env:
           runs_on: ${{ matrix.runs-on }}
@@ -88,15 +88,15 @@ jobs:
       - name: Generate build matrix
         id: matrix
         run: |
-          tee -a "$GITHUB_OUTPUT" <<EOF
+          cat <<EOF >>"$GITHUB_OUTPUT"
           json<<JSON
           $(cat *.ndjson | jq --slurp '{build: .}')
           JSON
           EOF
         shell: bash
         working-directory: ${{ steps.files.outputs.download-path }}
-  test-examples:
-    name: Test examples
+  test-example:
+    name: Test example
     needs:
       - build-matrix
     strategy:
@@ -113,12 +113,12 @@ jobs:
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: lix-stores-${{ runner.os }}-${{ runner.arch }}
-      - name: Install Lix ${{ matrix.build.lix-version }}
+      - name: Install Lix ${{ matrix.build.version }}
         uses: ./
         with:
           lix-on-tmpfs: true
           lix-store-dir: ${{ steps.lix-stores.outputs.download-path }}
-          lix-version: ${{ matrix.build.lix-version }}
+          lix-version: ${{ matrix.build.version }}
       - name: Verify that Lix was installed
         run: |
           nix-build -v --version
@@ -130,7 +130,7 @@ jobs:
           name: ${{ vars.CACHIX_NAME }}
       - name: Build flake
         run: |
-          nix build ./examples/flakes
+          nix build ./example
         shell: bash
       - name: Print `hello, world` message
         run: |

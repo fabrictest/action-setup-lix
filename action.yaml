@@ -53,8 +53,8 @@ runs:
             format('{0}/lix-{1}-{2}-{3}.tar.zstd',
               inputs.lix-store-dir,
               inputs.lix-version,
-              fromjson('{"ARM64": "aarch64", "X64": "x86_64"}')[runner.arch],
-              fromjson('{"macOS": "darwin", "Linux": "linux"}')[runner.os]
+              fromjson('{"ARM64":"aarch64","X64":"x86_64"}')[runner.arch],
+              fromjson('{"macOS":"darwin","Linux":"linux"}')[runner.os]
             )
           }}
         NIX_CONF: ${{ inputs.nix-conf || null }}

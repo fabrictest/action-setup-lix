@@ -89,8 +89,10 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
               strict_required_status_checks_policy = false;
               required_status_checks =
                 let
-                  workflow = cell.lib.readYAML (self + /.github/workflows/build-lix.yaml);
-                  job = [ workflow.jobs.test-examples.name ];
+                  workflow = cell.lib.readYAML (self + /.github/workflows/lix.yaml);
+                  job = l.map (job: workflow.jobs.${job}.name) [
+                    "test-example"
+                  ];
                   lix-version = l.pipe lix.packages [
                     (l.filterAttrs (name: _: name != "lix-stores"))
                     (l.mapAttrsToList (_: drv: drv.version))
