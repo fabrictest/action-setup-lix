@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-test "${RUNNER_DEBUG:-}" != 1 || set -x
-
 function group {
 	printf "::group::%s\n" "$*"
 }
@@ -21,6 +19,7 @@ group 'Preflight checks'
 	test ! -e /nix -o -w /nix ||
 		die "failed to set up Lix: /nix exists but isn't writable"
 
+	: "${GID:=$(id -g)}"
 	# FIXME(eff): The command below doesn't work as intended when used in
 	#  other repositories.
 	: "${GITHUB_ACTION_REPOSITORY:="$GITHUB_REPOSITORY"}"
@@ -34,7 +33,7 @@ group 'Mount /nix'
 	Linux)
 		sudo install -d -o "$USER" /nix
 		! "$LIX_ON_TMPFS" ||
-			sudo mount -t tmpfs -o "size=90%,mode=0755,uid=$UID,gid=$(id -g)" tmpfs /nix
+			sudo mount -t tmpfs -o "size=90%,mode=0755,uid=$UID,gid=$GID" tmpfs /nix
 		;;
 	macOS)
 		sudo tee -a /etc/synthetic.conf <<<$'nix\nrun\tprivate/var/run\n' >/dev/null
