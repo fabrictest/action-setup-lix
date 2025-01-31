@@ -22,9 +22,6 @@ group 'Preflight checks'
 		die "failed to set up Lix: /nix exists but isn't writable"
 
 	: "${GID:=$(id -g)}"
-	# FIXME(eff): The command below doesn't work as intended when used in
-	#  other repositories.
-	: "${GITHUB_ACTION_REPOSITORY:="$GITHUB_REPOSITORY"}"
 	: "${XDG_CONFIG_HOME:="$HOME/.config"}"
 }
 endgroup

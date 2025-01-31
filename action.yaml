@@ -46,6 +46,8 @@ runs:
       working-directory: ${{ github.action_path }}
       run: ./action.bash
       env:
+        # NOTE(eff): https://github.com/orgs/community/discussions/49245
+        GITHUB_ACTION_REPOSITORY: ${{ github.action_repository || github.repository }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
         LIX_ON_TMPFS: ${{ inputs.lix-on-tmpfs == 'true' }}
         LIX_STORE_FILE: >-
