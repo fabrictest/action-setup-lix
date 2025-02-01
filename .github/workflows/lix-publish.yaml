@@ -69,11 +69,11 @@ jobs:
         run: |
           pr=$(
             gh pr list \
-              -S "$tag"' is:merged label:"autorelease: tagged" sort:created-desc' \
-              -L 1 \
-              -q '.[0].number'
+                -S "$tag"' is:merged label:"autorelease: tagged" sort:created-desc' \
+                -L 1 \
+                -q '.[0].number'
           )
-          gh pr edit "$pr" \
+          test -z "$pr" || gh pr edit "$pr" \
               --add-label 'autorelease: published' \
               --remove-label 'autorelease: tagged'
         shell: bash
