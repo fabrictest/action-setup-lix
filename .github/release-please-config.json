@@ -4,7 +4,9 @@
   "changelog-host": "https://github.com",
   "packages": {
     ".": {
-      "exclude-paths": [],
+      "exclude-paths": [
+        ".github"
+      ],
       "release-type": "simple",
       "version-file": "VERSION"
     }
