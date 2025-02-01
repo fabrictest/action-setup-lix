@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.1](https://github.com/fabrictest/action-setup-lix/compare/v0.12.0...v0.12.1) (2025-02-01)
+
+
+### Bug Fixes
+
+* Add json opt ([62e009d](https://github.com/fabrictest/action-setup-lix/commit/62e009d730adcbc6c83b5d5e7a7daac5a5209073))
+
 ## [0.12.0](https://github.com/fabrictest/action-setup-lix/compare/v0.11.0...v0.12.0) (2025-02-01)
 
 
