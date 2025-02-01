@@ -5,23 +5,50 @@ on:
     tags:
       - v[0-9]+.[0-9]+.[0-9]+
 jobs:
-  sync:
-    name: Sync v{major} and v{major}.{minor}
+  resolve:
+    name: Resolve tags to synchronize
     if: ${{ github.event.created }}
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    outputs:
+      tags: ${{ steps.tags.outputs.json }}
     steps:
-      - name: Synchronize tags
+      - name: Which tags to synchronize?
+        id: tags
         run: |
-          for tag in "${GITHUB_REF_NAME%.*}" "${GITHUB_REF_NAME%%.*}"; do
-            sha=$(
-              gh api repos/{owner}/{repo}/git/tags \
-                -f tag="$tag" -f message="$GITHUB_REF_NAME" -f object="$GITHUB_SHA" -f type=commit -q .sha)
-            gh api -X PATCH repos/{owner}/{repo}/git/refs/tags/"$tag" -f sha="$sha" >/dev/null 2>&1 ||
-              gh api repos/{owner}/{repo}/git/refs -f ref=refs/tags/"$tag" -f sha="$sha" >/dev/null
-          done
+          {
+            echo json'<<'JSON
+            jq -Rcn '[inputs | select(length > 0)]' <<EOF
+          ${GITHUB_REF_NAME%.*}
+          ${GITHUB_REF_NAME%%.*}
+          EOF
+            echo JSON
+          } >>"$GITHUB_OUTPUT"
         shell: bash
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
+  sync:
+    needs:
+      - resolve
+    strategy:
+      fail-fast: false
+      matrix:
+        tag: ${{ fromjson(needs.resolve.outputs.tags) }}
+    name: ${{ matrix.tag }} → ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Synchronize tag
+        run: |
+          sha=$(
+            gh api repos/{owner}/{repo}/git/tags \
+                -f tag="$tag" -f message="$tag → $GITHUB_REF_NAME" -f object="$GITHUB_SHA" -f type=commit -q .sha
+          )
+          gh api -X PATCH repos/{owner}/{repo}/git/refs/tags/"$tag" -f sha="$sha" >/dev/null 2>&1 ||
+            gh api repos/{owner}/{repo}/git/refs -f ref=refs/tags/"$tag" -f sha="$sha" >/dev/null
+        shell: bash
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          tag: ${{ matrix.tag }}
