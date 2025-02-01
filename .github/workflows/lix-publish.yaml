@@ -40,7 +40,7 @@ jobs:
       - name: Verify integrity of Lix stores
         if: ${{ steps.lix-stores.outputs.found_artifact }}
         run: |
-          for f in lix-stores/lix-*.tar.*; do
+          for f in lix-stores-*/lix-*.tar.*; do
             gh attestation verify "$f" --{,signer-}repo="$GITHUB_REPOSITORY"
           done
         shell: bash
