@@ -30,7 +30,7 @@ jobs:
       id-token: write
     steps:
       - name: Bootstrap Lix
-        uses: fabrictest/action-setup-lix@a745987f4ef56ddcc1df9d7974cef54f0704ca46 # v0.3.0
+        uses: fabrictest/action-setup-lix@b0d6d18b6c0d22639d5a3bd3f6454dab2f61f04c # v0.13.0
         with:
           lix-on-tmpfs: true
       - name: Set up Magic Nix cache
