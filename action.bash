@@ -55,7 +55,7 @@ group 'Install Lix store'
 {
 	test -f "$LIX_STORE_FILE" ||
 		gh release download v"$(cat "$ACTION_PATH"/VERSION)" \
-			--output "${LIX_STORE_FILE##*/}" \
+			--output "$LIX_STORE_FILE" \
 			--pattern "${LIX_STORE_FILE##*/}" \
 			--repo "$ACTION_REPOSITORY"
 	gh attestation verify "$LIX_STORE_FILE" --{,signer-}repo="$ACTION_REPOSITORY"
