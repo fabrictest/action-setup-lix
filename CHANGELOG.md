@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.12.0](https://github.com/fabrictest/action-setup-lix/compare/v0.11.0...v0.12.0) (2025-02-01)
+
+
+### Features
+
+* Split tag sync jobs ([1274f4e](https://github.com/fabrictest/action-setup-lix/commit/1274f4e2dff12da4389de068c8226ab12711103a))
+* Try again ([ceb0379](https://github.com/fabrictest/action-setup-lix/commit/ceb03795e92ce6e393d3b0854a1a90c0ef0e1d36))
+* Yeah ([9b64f1c](https://github.com/fabrictest/action-setup-lix/commit/9b64f1cbe2568717787ad502ce00f0320cbae5ba))
+
+
+### Bug Fixes
+
+* Do not abort job ([8ab5625](https://github.com/fabrictest/action-setup-lix/commit/8ab5625f09745dd83e400f040e39dd6183f0c069))
+* Runner.os + runner.arch, not runs-on ([51645f5](https://github.com/fabrictest/action-setup-lix/commit/51645f562bd98a534020dd162b3a5517a071f5b8))
+* Scan all download dirs ([c137572](https://github.com/fabrictest/action-setup-lix/commit/c1375729b4f8af8a08f41ec048ab8343319a67d2))
+* Welp ([8c754a9](https://github.com/fabrictest/action-setup-lix/commit/8c754a921274b3386fb6ff8aee633444d8836896))
+
 ## [0.11.0](https://github.com/fabrictest/action-setup-lix/compare/v0.10.0...v0.11.0) (2025-01-31)
 
 
