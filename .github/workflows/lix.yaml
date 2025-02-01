@@ -60,15 +60,15 @@ jobs:
           printf %s\\n result/lix-*.tar.* |
             cut -d- -f2 |
             jq -Rc --arg runs-on "$runs_on" \
-              '{version: .} + $ARGS.named' >build-matrix-"$runs_on".ndjson
+              '{version: .} + $ARGS.named' >build-matrix-"$RUNNER_OS"-"$RUNNER_ARCH".ndjson
         shell: bash
         env:
           runs_on: ${{ matrix.runs-on }}
       - name: Upload build matrix files to GitHub
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
-          name: build-matrix-${{ matrix.runs-on }}
-          path: build-matrix-${{ matrix.runs-on }}.ndjson
+          name: build-matrix-${{ runner.os }}-${{ runner.arch }}
+          path: build-matrix-${{ runner.os }}-${{ runner.arch }}.ndjson
           compression-level: 9
           retention-days: 1
   build-matrix:
