@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.13.0](https://github.com/fabrictest/action-setup-lix/compare/v0.12.2...v0.13.0) (2025-02-01)
+
+
+### Features
+
+* Finer grain ([92a18d8](https://github.com/fabrictest/action-setup-lix/commit/92a18d8462499c21329d5e0c7a1c516bccb3131e))
+* Remove lix store tarball after installing it ([444edc9](https://github.com/fabrictest/action-setup-lix/commit/444edc937c2f805a18ba11054fabdac6049c0902))
+
+
+### Bug Fixes
+
+* Download file to runner.temp ([4d78f26](https://github.com/fabrictest/action-setup-lix/commit/4d78f26d35714092db66b74cf834e861fd5e73dd))
+
 ## [0.12.2](https://github.com/fabrictest/action-setup-lix/compare/v0.12.1...v0.12.2) (2025-02-01)
 
 
