@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.2](https://github.com/fabrictest/action-setup-lix/compare/v0.12.1...v0.12.2) (2025-02-01)
+
+
+### Bug Fixes
+
+* Script vars ([fd949cc](https://github.com/fabrictest/action-setup-lix/commit/fd949cc8728e4ade8862c3b523da3100feb7119b))
+
 ## [0.12.1](https://github.com/fabrictest/action-setup-lix/compare/v0.12.0...v0.12.1) (2025-02-01)
 
 
