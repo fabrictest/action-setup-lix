@@ -62,6 +62,7 @@ group 'Install Lix store'
 	rm -rf /nix/var/gha
 	test "$RUNNER_OS" != macOS && tar=tar || tar=gtar
 	$tar --auto-compress --extract --skip-old-files --directory /nix --strip-components 1 <"$LIX_STORE_FILE"
+	rm -f "$LIX_STORE_FILE"
 }
 endgroup
 
