@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.14.0](https://github.com/fabrictest/action-setup-lix/compare/v0.13.0...v0.14.0) (2025-02-15)
+
+
+### Features
+
+* Expose devshells through nix-develop ([0f5632b](https://github.com/fabrictest/action-setup-lix/commit/0f5632b23c196766591153e851fd7ecda66f61a1))
+
+
+### Bug Fixes
+
+* Rename action build workflow ([eeaa156](https://github.com/fabrictest/action-setup-lix/commit/eeaa156fddcf84bde65b9893876e9e6f8fbcedba))
+
 ## [0.13.0](https://github.com/fabrictest/action-setup-lix/compare/v0.12.2...v0.13.0) (2025-02-01)
 
 ### Features
