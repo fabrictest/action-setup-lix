@@ -76,6 +76,7 @@ jobs:
     needs:
       - build-lix-stores
     runs-on: ubuntu-latest
+    permissions: {}
     outputs:
       json: ${{ steps.build-matrix.outputs.json }}
     steps:
@@ -103,6 +104,7 @@ jobs:
       fail-fast: true
       matrix: ${{ fromJSON(needs.build-matrix.outputs.json) }}
     runs-on: ${{ matrix.build.runs-on }}
+    permissions: {}
     steps:
       - name: Check out repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
