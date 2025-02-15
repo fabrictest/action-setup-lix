@@ -63,17 +63,17 @@ rulesets:
     type: pull_request
   - parameters:
       required_status_checks:
-      - context: Test example (2.90.0, macos-13)
+      - context: Example (2.90.0, macos-13)
         integration_id: 15368
-      - context: Test example (2.90.0, macos-15)
+      - context: Example (2.90.0, macos-15)
         integration_id: 15368
-      - context: Test example (2.90.0, ubuntu-24.04)
+      - context: Example (2.90.0, ubuntu-24.04)
         integration_id: 15368
-      - context: Test example (2.91.1, macos-13)
+      - context: Example (2.91.1, macos-13)
         integration_id: 15368
-      - context: Test example (2.91.1, macos-15)
+      - context: Example (2.91.1, macos-15)
         integration_id: 15368
-      - context: Test example (2.91.1, ubuntu-24.04)
+      - context: Example (2.91.1, ubuntu-24.04)
         integration_id: 15368
       strict_required_status_checks_policy: false
     type: required_status_checks
