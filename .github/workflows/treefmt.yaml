@@ -16,7 +16,6 @@ permissions:
 jobs:
   format:
     name: Format changes
-    if: ${{ github.event.sender.login != 'the-accuser[bot]' }}
     runs-on: ubuntu-latest
     steps:
       - name: Install Lix
@@ -33,28 +32,31 @@ jobs:
         with:
           persist-credentials: false
       - name: Format files
-        id: format
-        # TODO(eff): Switch to --ci when running on commits by TheAccuser.
         run: |
-          nix develop --command treefmt
+          nix develop -c treefmt --no-cache --fail-on-change
+        shell: bash
+      - name: List modified files
+        if: ${{ failure() && github.event.sender.login != 'the-accuser[bot]' }}
+        id: files-to-commit
+        run: |
           {
-            echo files'<<'FILES
+            echo list'<<'LIST
             git diff --name-only
-            echo FILES
+            echo LIST
           } >>"$GITHUB_OUTPUT"
         shell: bash
       - name: Generate app token
-        if: ${{ !cancelled() && steps.format.outputs.files }}
+        if: ${{ failure() && steps.files-to-commit.outputs.list }}
         id: app-token
         uses: actions/create-github-app-token@0d564482f06ca65fa9e77e2510873638c82206f2 # v1.11.5
         with:
           app-id: ${{ vars.THE_ACCUSER_APP_ID }}
           private-key: ${{ secrets.THE_ACCUSER_PRIVATE_KEY }}
       - name: Commit changes
-        if: ${{ !cancelled() && steps.format.outputs.files }}
+        if: ${{ failure() && steps.files-to-commit.outputs.list }}
         uses: IAreKyleW00t/verified-bot-commit@dc18a0710cb31181d9e3e0e3adca7206e0d39258 # v1.0.11
         with:
-          files: ${{ steps.format.outputs.files }}
+          files: ${{ steps.files-to-commit.outputs.list }}
           message: |
             style: format changes
           ref: ${{ github.event.pull_request.head.ref }}
