@@ -28,13 +28,13 @@ jobs:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
   sync:
+    name: Synchronize tag
     needs:
       - resolve
     strategy:
       fail-fast: false
       matrix:
-        tag: ${{ fromjson(needs.resolve.outputs.tags) }}
-    name: ${{ matrix.tag }} → ${{ github.ref_name }}
+        tag: ${{ fromJSON(needs.resolve.outputs.tags) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -45,8 +45,8 @@ jobs:
             gh api repos/{owner}/{repo}/git/tags \
                 -f tag="$tag" -f message="$tag → $GITHUB_REF_NAME" -f object="$GITHUB_SHA" -f type=commit -q .sha
           )
-          gh api -X PATCH repos/{owner}/{repo}/git/refs/tags/"$tag" -f sha="$sha" >/dev/null 2>&1 ||
-            gh api repos/{owner}/{repo}/git/refs -f ref=refs/tags/"$tag" -f sha="$sha" >/dev/null
+          gh api -X PATCH repos/{owner}/{repo}/git/refs/tags/"$tag" -f sha="$sha" ${{ runner.debug && '' || '>/dev/null 2>&1' }} ||
+            gh api repos/{owner}/{repo}/git/refs -f ref=refs/tags/"$tag" -f sha="$sha" ${{ runner.debug && '' || '>/dev/null' }}
         shell: bash
         env:
           GH_REPO: ${{ github.repository }}

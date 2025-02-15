@@ -1,12 +1,12 @@
 ---
-name: Lix / Publish
+name: Action / Publish
 on:
   release:
     types:
       - published
 jobs:
   attach-lix-stores:
-    name: Attach Lix stores to the GitHub release
+    name: Attach Lix stores to GitHub release
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -47,7 +47,7 @@ jobs:
         working-directory: ${{ runner.temp }}
         env:
           GH_TOKEN: ${{ github.token }}
-      - name: Attach Lix stores to the GitHub release
+      - name: Attach Lix stores to GitHub release
         if: ${{ steps.lix-stores.outputs.found_artifact }}
         run: |
           gh release upload "$tag" lix-stores-*/lix-*.tar.*
@@ -65,20 +65,31 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - name: Mark release PR as published
+      - name: Retrieve release PR
+        id: pr
         run: |
-          pr=$(
+          {
+            echo number'<<'NUMBER
             gh pr list \
                 -S "$tag"' is:merged label:"autorelease: tagged" sort:created-desc' \
                 -L 1 \
                 -q '.[0].number' \
                 --json number
-          )
-          test -z "$pr" || gh pr edit "$pr" \
-              --add-label 'autorelease: published' \
-              --remove-label 'autorelease: tagged'
+            echo NUMBER
+          } >> "$GITHUB_OUTPUT"
         shell: bash
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
           tag: ${{ github.event.release.tag_name }}
+      - name: Mark PR as published
+        if: ${{ steps.pr.outputs.number }}
+        run: |
+          gh pr edit "$pr" \
+            --remove-label 'autorelease: tagged' \
+            --add-label 'autorelease: published'
+        shell: bash
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          pr: ${{ steps.pr.outputs.number }}

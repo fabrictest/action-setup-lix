@@ -82,6 +82,11 @@
           "lix"
           "packages"
         ];
+
+        devShells = std.harvest self [
+          "local"
+          "shells"
+        ];
       };
 
   nixConfig = {

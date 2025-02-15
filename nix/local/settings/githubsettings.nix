@@ -89,7 +89,7 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
               strict_required_status_checks_policy = false;
               required_status_checks =
                 let
-                  workflow = cell.lib.readYAML (self + /.github/workflows/lix.yaml);
+                  workflow = cell.lib.readYAML (self + /.github/workflows/action.yaml);
                   job = l.map (job: workflow.jobs.${job}.name) [
                     "test-example"
                   ];

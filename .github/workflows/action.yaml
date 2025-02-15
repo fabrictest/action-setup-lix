@@ -1,5 +1,5 @@
 ---
-name: Lix
+name: Action
 on:
   pull_request:
     types:
@@ -13,7 +13,7 @@ on:
     - cron: 33 01 * * *
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref_name != github.event.repository.default_branch }}
 jobs:
   build-lix-stores:
     name: Build Lix stores
@@ -60,7 +60,7 @@ jobs:
           printf %s\\n result/lix-*.tar.* |
             cut -d- -f2 |
             jq -Rc --arg runs-on "$runs_on" \
-              '{version: .} + $ARGS.named' >build-matrix-"$RUNNER_OS"-"$RUNNER_ARCH".ndjson
+              '{version:.} + $ARGS.named' >build-matrix-"$RUNNER_OS"-"$RUNNER_ARCH".ndjson
         shell: bash
         env:
           runs_on: ${{ matrix.runs-on }}
@@ -77,7 +77,7 @@ jobs:
       - build-lix-stores
     runs-on: ubuntu-latest
     outputs:
-      json: ${{ steps.matrix.outputs.json }}
+      json: ${{ steps.build-matrix.outputs.json }}
     steps:
       - name: Download build matrix files
         id: files
@@ -86,11 +86,11 @@ jobs:
           pattern: build-matrix-*
           merge-multiple: true
       - name: Generate build matrix
-        id: matrix
+        id: build-matrix
         run: |
           cat <<EOF >>"$GITHUB_OUTPUT"
           json<<JSON
-          $(cat *.ndjson | jq --slurp '{build: .}')
+          $(cat *.ndjson | jq --slurp '{build:.}')
           JSON
           EOF
         shell: bash
@@ -101,7 +101,7 @@ jobs:
       - build-matrix
     strategy:
       fail-fast: true
-      matrix: ${{ fromjson(needs.build-matrix.outputs.json) }}
+      matrix: ${{ fromJSON(needs.build-matrix.outputs.json) }}
     runs-on: ${{ matrix.build.runs-on }}
     steps:
       - name: Check out repository

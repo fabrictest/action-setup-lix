@@ -35,13 +35,14 @@ jobs:
           persist-credentials: false
       - name: Lint Github actions and workflows
         run: |
-          pipx run --quiet -- zizmor --quiet --format=sarif --gh-hostname="${GITHUB_SERVER_URL#*://}" --persona=auditor . >results.sarif
+          pipx run --quiet -- \
+              zizmor --quiet --format=sarif --gh-hostname="${GITHUB_SERVER_URL#*://}" --persona=auditor . >results.sarif
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Upload SARIF report to GitHub
-        if: always()
+        if: ${{ !cancelled() }}
         uses: github/codeql-action/upload-sarif@f6091c0113d1dcf9b98e269ee48e8a7e51b7bdd4 # v3.28.5
         with:
-          category: zizmor
+          category: ${{ github.workflow }}
           sarif_file: results.sarif
