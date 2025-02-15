@@ -39,16 +39,31 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Synchronize tag
+      - name: Create tag object
+        id: object
         run: |
-          sha=$(
+          {
+            echo sha'<<'SHA
             gh api repos/{owner}/{repo}/git/tags \
-                -f tag="$tag" -f message="$tag → $GITHUB_REF_NAME" -f object="$GITHUB_SHA" -f type=commit -q .sha
-          )
-          gh api -X PATCH repos/{owner}/{repo}/git/refs/tags/"$tag" -f sha="$sha" ${{ runner.debug && '' || '>/dev/null 2>&1' }} ||
-            gh api repos/{owner}/{repo}/git/refs -f ref=refs/tags/"$tag" -f sha="$sha" ${{ runner.debug && '' || '>/dev/null' }}
+                -f tag="$tag" \
+                -f message="$tag → $GITHUB_REF_NAME" \
+                -f object="$GITHUB_SHA" \
+                -f type=commit \
+                -q .sha
+            echo SHA
+          } >>"$GITHUB_OUTPUT"
         shell: bash
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
           tag: ${{ matrix.tag }}
+      - name: Point reference to new tag object
+        run: |
+          gh api -X PATCH repos/{owner}/{repo}/git/refs/tags/"$tag" -f sha="$sha" ||
+            gh api repos/{owner}/{repo}/git/refs -f ref=refs/tags/"$tag" -f sha="$sha"
+        shell: bash
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          tag: ${{ matrix.tag }}
+          sha: ${{ steps.object.outputs.sha }}
