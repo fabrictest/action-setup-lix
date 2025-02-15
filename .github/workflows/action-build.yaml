@@ -1,5 +1,5 @@
 ---
-name: Action
+name: Action / Build
 on:
   pull_request:
     types:

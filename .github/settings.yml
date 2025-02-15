@@ -23,7 +23,7 @@ repository:
   private: false
   squash_merge_commit_message: PR_BODY
   squash_merge_commit_title: PR_TITLE
-  topics: github-actions,lix,nix
+  topics: github-actions,lix,nix,wip
   use_squash_pr_title_as_default: true
   visibility: public
 rulesets:

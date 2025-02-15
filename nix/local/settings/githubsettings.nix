@@ -17,7 +17,7 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
         inherit name;
         description = "Install Lix faster than you can refresh a GitHub Actions workflow page";
         homepage = "https://github.com/fabrictest/${name}";
-        topics = "github-actions,lix,nix";
+        topics = "github-actions,lix,nix,wip";
         private = false;
         visibility = "public";
         has_issues = true;
@@ -89,7 +89,7 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
               strict_required_status_checks_policy = false;
               required_status_checks =
                 let
-                  workflow = cell.lib.readYAML (self + /.github/workflows/action.yaml);
+                  workflow = cell.lib.readYAML (self + /.github/workflows/action-build.yaml);
                   job = l.map (job: workflow.jobs.${job}.name) [
                     "test-example"
                   ];
