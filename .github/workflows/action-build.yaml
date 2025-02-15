@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: ${{ github.ref_name != github.event.repository.default_branch }}
 jobs:
   build-lix-stores:
-    name: Build Lix stores
+    name: Lix stores
     strategy:
       fail-fast: true
       matrix:
@@ -72,7 +72,7 @@ jobs:
           compression-level: 9
           retention-days: 1
   build-matrix:
-    name: Resolve build matrix
+    name: Matrix
     needs:
       - build-lix-stores
     runs-on: ubuntu-latest
@@ -96,7 +96,7 @@ jobs:
         shell: bash
         working-directory: ${{ steps.files.outputs.download-path }}
   test-example:
-    name: Test example
+    name: Example
     needs:
       - build-matrix
     strategy:
