@@ -2,46 +2,34 @@
   description = "Install Lix faster than you can refresh a GitHub Actions workflow page";
 
   inputs = {
-    devshell = {
-      url = "github:numtide/devshell";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
+    # region Flake URLs
+    devshell.url = "github:numtide/devshell";
+    flake-utils.url = "github:numtide/flake-utils";
+    nixago.url = "github:nix-community/nixago";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    std.url = "github:divnix/std";
+    systems.url = "github:nix-systems/default";
+    # endregion
 
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-      inputs = {
-        systems.follows = "systems";
-      };
+    # region `follows` declarations
+    devshell.inputs = {
+      nixpkgs.follows = "nixpkgs";
     };
-
-    nixago = {
-      url = "github:nix-community/nixago";
-      inputs = {
-        nixago-exts.follows = "std/blank";
-        nixpkgs.follows = "nixpkgs";
-        flake-utils.follows = "flake-utils";
-      };
+    flake-utils.inputs = {
+      systems.follows = "systems";
     };
-
-    nixpkgs = {
-      url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixago.inputs = {
+      nixago-exts.follows = "std/blank";
+      nixpkgs.follows = "nixpkgs";
+      flake-utils.follows = "flake-utils";
     };
-
-    std = {
-      url = "github:divnix/std";
-      inputs = {
-        devshell.follows = "devshell";
-        lib.follows = "nixpkgs";
-        nixago.follows = "nixago";
-        nixpkgs.follows = "nixpkgs";
-      };
+    std.inputs = {
+      devshell.follows = "devshell";
+      lib.follows = "nixpkgs";
+      nixago.follows = "nixago";
+      nixpkgs.follows = "nixpkgs";
     };
-
-    systems = {
-      url = "github:nix-systems/default";
-    };
+    # endregion
   };
 
   outputs =
