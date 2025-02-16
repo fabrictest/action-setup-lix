@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Lix
-        uses: fabrictest/action-setup-lix@b0d6d18b6c0d22639d5a3bd3f6454dab2f61f04c # v0.13.0
+        uses: fabrictest/action-setup-lix@f8931851e8f8db4d7745a048a157cdcca7b5e636 # v0.14.0
         with:
           lix-on-tmpfs: true
       - name: Set up Magic Nix cache
