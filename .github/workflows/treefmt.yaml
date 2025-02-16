@@ -22,11 +22,11 @@ jobs:
         uses: fabrictest/action-setup-lix@b0d6d18b6c0d22639d5a3bd3f6454dab2f61f04c # v0.13.0
         with:
           lix-on-tmpfs: true
-      - name: Set up Cachix
-        uses: cachix/cachix-action@ad2ddac53f961de1989924296a1f236fcfbaa4fc # v15
+      - name: Set up Magic Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@6221693898146dc97e38ad0e013488a16477a4c4 # v9
         with:
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          name: ${{ vars.CACHIX_NAME }}
+          diagnostic-endpoint: ""
+          use-flakehub: false
       - name: Check out repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
