@@ -61,7 +61,7 @@ jobs:
           printf %s\\n result/lix-*.tar.* |
             cut -d- -f2 |
             jq -Rc --arg runs-on "$runs_on" \
-              '{version:.} + $ARGS.named' >build-matrix-"$RUNNER_OS"-"$RUNNER_ARCH".ndjson
+              '{version: .} + $ARGS.named' >build-matrix-"$RUNNER_OS"-"$RUNNER_ARCH".ndjson
         shell: bash
         env:
           runs_on: ${{ matrix.runs-on }}
@@ -92,7 +92,7 @@ jobs:
         run: |
           cat <<EOF >>"$GITHUB_OUTPUT"
           json<<JSON
-          $(cat *.ndjson | jq --slurp '{build:.}')
+          $(cat *.ndjson | jq --slurp '{build: .}')
           JSON
           EOF
         shell: bash
@@ -105,7 +105,6 @@ jobs:
       fail-fast: true
       matrix: ${{ fromJSON(needs.build-matrix.outputs.json) }}
     runs-on: ${{ matrix.build.runs-on }}
-    permissions: {}
     steps:
       - name: Check out repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
