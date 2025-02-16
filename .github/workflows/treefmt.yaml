@@ -11,12 +11,13 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-permissions:
-  contents: read
+permissions: {}
 jobs:
   format:
     name: Format changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Install Lix
         uses: fabrictest/action-setup-lix@f8931851e8f8db4d7745a048a157cdcca7b5e636 # v0.14.0

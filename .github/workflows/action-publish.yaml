@@ -4,10 +4,7 @@ on:
   release:
     types:
       - published
-permissions:
-  actions: read
-  contents: write # zizmor: ignore[excessive-permissions]
-  pull-requests: write # zizmor: ignore[excessive-permissions]
+permissions: {}
 jobs:
   attach-lix-stores:
     name: Attach Lix stores to GitHub release

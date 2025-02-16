@@ -14,9 +14,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref_name != github.event.repository.default_branch }}
-permissions:
-  attestations: write # zizmor: ignore[excessive-permissions]
-  id-token: write # zizmor: ignore[excessive-permissions]
+permissions: {}
 jobs:
   build-lix-stores:
     name: Lix stores

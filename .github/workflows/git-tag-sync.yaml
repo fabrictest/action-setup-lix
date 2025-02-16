@@ -4,14 +4,12 @@ on:
   push:
     tags:
       - v[0-9]+.[0-9]+.[0-9]+
-permissions:
-  contents: write # zizmor: ignore[excessive-permissions]
+permissions: {}
 jobs:
   resolve:
     name: Resolve tags to synchronize
     if: ${{ github.event.created }}
     runs-on: ubuntu-latest
-    permissions: {}
     outputs:
       tags: ${{ steps.tags.outputs.json }}
     steps:
