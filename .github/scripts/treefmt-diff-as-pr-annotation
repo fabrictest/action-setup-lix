@@ -6,8 +6,8 @@ old="$2"
 new="$5"
 
 job_id="$RUNNER_TEMP"/job-id
-test -f "$job_id_file" ||
-	gh api repos/{owner}/{repo}/actions/runs/"$GITHUB_RUN_ID"/attempts/"$GITHUB_RUN_ATTEMPT"/jobs -q '.jobs[0].id' >"$job_id"
+test -f "$job_id" ||
+	gh api repos/{owner}/{repo}/actions/runs/"$GITHUB_RUN_ID"/attempts/"$GITHUB_RUN_ATTEMPT"/jobs | jq -r '.jobs[] | select(.runner_name=='"$RUNNER_NAME"') | .id' >"$job_id"
 job_id=$(cat "$job_id")
 
 endl=$'\n'
