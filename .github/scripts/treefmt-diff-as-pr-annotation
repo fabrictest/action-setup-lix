@@ -5,10 +5,10 @@ path="$1"
 old="$2"
 new="$5"
 
-job_id="$RUNNER_TEMP"/job-id
-test -f "$job_id" ||
-	gh api repos/{owner}/{repo}/actions/runs/"$GITHUB_RUN_ID"/attempts/"$GITHUB_RUN_ATTEMPT"/jobs | jq -r '.jobs[] | select(.runner_name=='"$RUNNER_NAME"') | .id' >"$job_id"
-job_id=$(cat "$job_id")
+job_id_file="$RUNNER_TEMP"/job-id
+test -f "$job_id_file" ||
+	gh api repos/{owner}/{repo}/actions/runs/"$GITHUB_RUN_ID"/attempts/"$GITHUB_RUN_ATTEMPT"/jobs | jq -r '.jobs[] | select(.runner_name=='"$RUNNER_NAME"') | .id' >"$job_id_file"
+job_id=$(cat "$job_id_file")
 
 endl=$'\n'
 diff --changed-group-format "::error title=$GITHUB_WORKFLOW,file=$path,line=%df%(n=0?:%(n=1?:,endLine=%dl))::Format violations found.  See: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT#summary-$job_id.$endl" --line-format='' "$old" "$new" || :
