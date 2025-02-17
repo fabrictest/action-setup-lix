@@ -32,13 +32,9 @@ for this, and works perfectly with this action (see below).
 
 ## Inputs
 
-See [action.yml](action.yml) for documentation of the available inputs.
-The available Lix versions are listed in the [release
-notes](https://github.com/fabrictest/action-setup-lix/releases/latest).
+TODO: Generate inputs table.
 
 ## Usage
-
-### Minimal example
 
 The following workflow installs Lix and then just runs
 `nix-build --version`:
@@ -72,12 +68,6 @@ accept-flake-config = true
 You can see the flake definition for the above example in
 [examples/flakes/flake.nix](examples/flakes/flake.nix).
 
-### Using Cachix
-
-You can use the [Cachix action](https://github.com/marketplace/actions/cachix)
-together with this action, just make sure you put it after this action in your
-workflow.
-
 ### Using specific Lix versions locally
 
 Locally, you can use this repository's Lix flake to build or run any of the
@@ -96,7 +86,7 @@ nix build github:fabrictest/action-setup-lix#lix-2_91_1 >/dev/null
 nix (Lix, like Nix) 2.91.1
 ```
 
-With `nix shell -c` you can also directly run Nix like this:
+You can also directly run Lix with `nix shell -c`:
 
 ```$
 nix shell github:fabrictest/action-setup-lix#lix-2_91_1 -c nix --quiet --version
@@ -106,14 +96,16 @@ nix shell github:fabrictest/action-setup-lix#lix-2_91_1 -c nix --quiet --version
 nix (Lix, like Nix) 2.91.1
 ```
 
-List all available Lix versions like this:
+List all available Lix versions with:
+
+<!-- x-release-please-start-version -->
 
 ```$
-nix flake show --all-systems github:fabrictest/action-setup-lix/v0.2.0
+nix flake show --all-systems github:fabrictest/action-setup-lix/v0.14.0
 ```
 
 ```
-github:fabrictest/action-setup-lix/39b3f0cad45d2ca812835c3d861f6d7e1746bc22
+github:fabrictest/action-setup-lix/f8931851e8f8db4d7745a048a157cdcca7b5e636
 ├───__functor: unknown
 ├───__std: unknown
 ├───aarch64-darwin: unknown
@@ -150,12 +142,22 @@ github:fabrictest/action-setup-lix/39b3f0cad45d2ca812835c3d861f6d7e1746bc22
 └───x86_64-linux: unknown
 ```
 
+<!-- x-release-please-end -->
+
 If you want to make sure that the version of Lix you're trying to build hasn't
-been removed in the latest revision of `action-lix-quick-install`, you can
-specify a specific release of `action-lix-quick-install` like this:
+been removed in the latest revision of `action-setup-lix`, you can
+specify a specific release of `action-setup-lix` like this:
+
+<!-- x-release-please-start-version -->
 
 ```console
-$ nix build github:fabrictest/action-lix-quick-install/v1#lix-2_91_1
+$ nix build github:fabrictest/action-setup-lix/v0.14.0#lix-2_91_1
 ```
 
-Note that we've added `/v1` to the flake url above.
+Note that we've added `/v0.14.0` to the flake URL above.
+
+<!-- x-release-please-end -->
+
+# Credits
+
+TODO
