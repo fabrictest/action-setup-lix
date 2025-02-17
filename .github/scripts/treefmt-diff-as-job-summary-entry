@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+path="$1"
+old="$2"
+new="$5"
+
+printf -- '- [`%s`](%s):\n\n' "$path" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$GITHUB_SHA/$path"
+printf -- '  ```````````diff\n'
+
+# NOTE(eff): Strip diff header and indent the body.
+diff -u "$old" "$new" | tail -n +3 | sed -e 's/^/  /' || :
+
+printf -- '  ```````````\n\n'

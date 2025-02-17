@@ -36,8 +36,6 @@ inputs:
       Defaults to `github.token`.
     default: ${{ github.token }}
   lix-store-dir:
-    description: |
-      Internal.
     default: ${{ runner.temp }}
 runs:
   using: composite

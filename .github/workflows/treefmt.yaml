@@ -62,3 +62,19 @@ jobs:
             style: format changes
           ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ steps.app-token.outputs.token }}
+      - name: Add changes as PR annotations
+        if: ${{ failure() && !steps.files-to-commit.outputs.list }}
+        run: |
+          export GIT_EXTERNAL_DIFF=./.github/scripts/treefmt-diff-as-pr-annotation
+          git -P diff --diff-filter=M
+        shell: bash
+      - name: Log changes in job summary
+        if: ${{ failure() && !steps.files-to-commit.outputs.list }}
+        run: |
+          export GIT_EXTERNAL_DIFF=./.github/scripts/treefmt-diff-as-job-summary-entry
+          git diff --quiet || {
+            printf '\n\nThe following files have format violations:\n\n'
+            git -P diff --diff-filter=M
+            printf '\n\n---\n\n'
+          } >>"$GITHUB_STEP_SUMMARY"
+        shell: bash
