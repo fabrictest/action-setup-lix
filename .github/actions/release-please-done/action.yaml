@@ -1,0 +1,53 @@
+name: release-please-done
+author: F. Emerson
+description: |
+  Marks a release pull request opened by Release Please as published.
+  This event marks the end of the release process.
+
+  Required permissions:
+
+  - `pull-requests`: `write`
+inputs:
+  tag:
+    description: |
+      Name of the release tag.
+    required: true
+  repository:
+    description: |
+      Repository where the release process took place.
+    default: ${{ github.repository }}
+  github-token:
+    description: |
+      Token to authenticate to GitHub API.  Defaults to `secrets.GITHUB_TOKEN`.
+    default: ${{ github.token }}
+runs:
+  using: composite
+  steps:
+    - name: Retrieve PR
+      id: pr
+      run: |
+        {
+          echo number'<<'NUMBER
+          gh pr list \
+              -S "$tag"' is:merged label:"autorelease: tagged" sort:created-desc' \
+              -L 1 \
+              -q '.[0].number' \
+              --json number
+          echo NUMBER
+        } >> "$GITHUB_OUTPUT"
+      shell: bash
+      env:
+        GH_REPO: ${{ inputs.repository }}
+        GH_TOKEN: ${{ inputs.github-token }}
+        tag: ${{ inputs.tag }}
+    - name: Mark PR as published
+      if: ${{ steps.pr.outputs.number }}
+      run: |
+        gh pr edit "$pr" \
+          --remove-label 'autorelease: tagged' \
+          --add-label 'autorelease: published'
+      shell: bash
+      env:
+        GH_REPO: ${{ inputs.repository }}
+        GH_TOKEN: ${{ inputs.github-token }}
+        pr: ${{ steps.pr.outputs.number }}

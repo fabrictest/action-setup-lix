@@ -59,38 +59,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           tag: ${{ github.event.release.tag_name }}
   publish-pr:
-    name: Mark release PR as published
+    name: Mark PR opened by Release Please as published
     needs:
       - attach-lix-stores
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:
-      - name: Retrieve release PR
-        id: pr
-        run: |
-          {
-            echo number'<<'NUMBER
-            gh pr list \
-                -S "$tag"' is:merged label:"autorelease: tagged" sort:created-desc' \
-                -L 1 \
-                -q '.[0].number' \
-                --json number
-            echo NUMBER
-          } >> "$GITHUB_OUTPUT"
-        shell: bash
-        env:
-          GH_REPO: ${{ github.repository }}
-          GH_TOKEN: ${{ github.token }}
-          tag: ${{ github.event.release.tag_name }}
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
       - name: Mark PR as published
-        if: ${{ steps.pr.outputs.number }}
-        run: |
-          gh pr edit "$pr" \
-            --remove-label 'autorelease: tagged' \
-            --add-label 'autorelease: published'
-        shell: bash
-        env:
-          GH_REPO: ${{ github.repository }}
-          GH_TOKEN: ${{ github.token }}
-          pr: ${{ steps.pr.outputs.number }}
+        uses: ./.github/actions/release-please-done
+        with:
+          tag: ${{ github.event.release.tag_name }}
+
