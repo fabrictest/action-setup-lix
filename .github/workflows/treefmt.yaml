@@ -55,7 +55,7 @@ jobs:
           private-key: ${{ secrets.THE_ACCUSER_PRIVATE_KEY }}
       - name: Commit changes
         if: ${{ failure() && steps.files-to-commit.outputs.list }}
-        uses: IAreKyleW00t/verified-bot-commit@dc18a0710cb31181d9e3e0e3adca7206e0d39258 # v1.0.11
+        uses: IAreKyleW00t/verified-bot-commit@23b4a1caa2c6beccca0ebb28814009a804d9d3b3 # v1.0.12
         with:
           files: ${{ steps.files-to-commit.outputs.list }}
           message: |
