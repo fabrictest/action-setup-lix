@@ -7,7 +7,7 @@
     flake-utils.url = "github:numtide/flake-utils";
     nixago.url = "github:nix-community/nixago";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
-    std.url = "github:divnix/std/5b19a01095518d1acbd1975b1903b83ace4fe0dd";
+    std.url = "github:divnix/std/def0d22e6bcfbfc65e72c3d29fe387dba89fcb52";
     systems.url = "github:nix-systems/default";
     # endregion
 
