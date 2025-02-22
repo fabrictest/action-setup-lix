@@ -38,42 +38,65 @@ jobs:
         shell: bash
       - name: List modified files
         if: ${{ failure() && github.event.sender.login != 'the-accuser[bot]' }}
-        id: files-to-commit
+        id: changes
         run: |
           {
-            echo list'<<'LIST
+            echo files'<<'FILES
             git diff --name-only
-            echo LIST
+            echo FILES
           } >>"$GITHUB_OUTPUT"
         shell: bash
       - name: Generate app token
-        if: ${{ failure() && steps.files-to-commit.outputs.list }}
+        if: ${{ failure() && steps.changes.outputs.files }}
         id: app-token
         uses: actions/create-github-app-token@0d564482f06ca65fa9e77e2510873638c82206f2 # v1.11.5
         with:
           app-id: ${{ vars.THE_ACCUSER_APP_ID }}
           private-key: ${{ secrets.THE_ACCUSER_PRIVATE_KEY }}
       - name: Commit changes
-        if: ${{ failure() && steps.files-to-commit.outputs.list }}
+        id: commit
+        if: ${{ failure() && steps.changes.outputs.files }}
         uses: IAreKyleW00t/verified-bot-commit@23b4a1caa2c6beccca0ebb28814009a804d9d3b3 # v1.0.12
         with:
-          files: ${{ steps.files-to-commit.outputs.list }}
+          files: ${{ steps.changes.outputs.files }}
           message: |
-            style: format changes
+            style: format changes in pull request
           ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ steps.app-token.outputs.token }}
-      - name: Add changes as PR annotations
-        if: ${{ failure() && !steps.files-to-commit.outputs.list }}
+      - name: Log changes as PR annotations
+        if: ${{ failure() && !steps.commit.outputs.ref }}
         run: |
-          export GIT_EXTERNAL_DIFF=./.github/scripts/treefmt-diff-as-pr-annotation
+          GIT_EXTERNAL_DIFF=$(mktemp)
+          cat <<"EOF" >"$GIT_EXTERNAL_DIFF"
+          #!/usr/bin/env bash
+          endl=$'\n'
+          diff --changed-group-format "::error title=$GITHUB_WORKFLOW,file=$1,line=%df%(n=0?:%(n=1?:,endLine=%dl))::Format violations found.  See: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT#summary-$GITHUB_JOB_ID.$endl" --line-format= "$2" "$5" || :
+          EOF
+          chmod +x "$GIT_EXTERNAL_DIFF"
+          export GIT_EXTERNAL_DIFF
+          GITHUB_JOB_ID=$(
+            gh api repos/{owner}/{repo}/actions/runs/"$GITHUB_RUN_ID"/attempts/"$GITHUB_RUN_ATTEMPT"/jobs |
+              jq -r ".jobs[] | select(.runner_name==\"$RUNNER_NAME\") | .id"
+          )
+          export GITHUB_JOB_ID
           git -P diff --diff-filter=M
         shell: bash
-      - name: Log changes in job summary
-        if: ${{ failure() && !steps.files-to-commit.outputs.list }}
+      - name: Log changes as job summary
+        if: ${{ failure() && !steps.commit.outputs.ref }}
         run: |
-          export GIT_EXTERNAL_DIFF=./.github/scripts/treefmt-diff-as-job-summary-entry
-          git diff --quiet || {
-            printf '\n\nThe following files have format violations:\n\n'
+          GIT_EXTERNAL_DIFF=$(mktemp)
+          cat <<"EOF" >"$GIT_EXTERNAL_DIFF"
+          #!/usr/bin/env bash
+          printf '* [`%s`](%s):\n\n' "$1" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$GITHUB_SHA/$1"
+          printf '  ``````````````````````````````````````````````````````````````````diff\n'
+          diff -u "$2" "$5" | tail -n +3 | sed -e 's/^/  /' || :
+          printf '  ``````````````````````````````````````````````````````````````````\n\n'
+          EOF
+          chmod +x "$GIT_EXTERNAL_DIFF"
+          export GIT_EXTERNAL_DIFF
+          {
+            ! git diff --quiet || exit 0
+            printf '\n\nThe following files have format violations that require manual intervention:\n\n'
             git -P diff --diff-filter=M
             printf '\n\n---\n\n'
           } >>"$GITHUB_STEP_SUMMARY"

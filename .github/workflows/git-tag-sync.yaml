@@ -43,16 +43,12 @@ jobs:
       - name: Create tag object
         id: object
         run: |
-          {
-            echo sha'<<'SHA
-            gh api repos/{owner}/{repo}/git/tags \
-                -f tag="$tag" \
-                -f message="$tag → $GITHUB_REF_NAME" \
-                -f object="$GITHUB_SHA" \
-                -f type=commit \
-                -q .sha
-            echo SHA
-          } >>"$GITHUB_OUTPUT"
+          gh api repos/{owner}/{repo}/git/tags \
+              -f tag="$tag" \
+              -f message="$tag → $GITHUB_REF_NAME" \
+              -f object="$GITHUB_SHA" \
+              -f type=commit \
+              -t 'sha={{.sha}}' >>"$GITHUB_OUTPUT"
         shell: bash
         env:
           GH_REPO: ${{ github.repository }}

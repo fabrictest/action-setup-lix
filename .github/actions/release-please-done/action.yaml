@@ -9,17 +9,17 @@ description: |
 
   - `pull-requests`: `write`
 inputs:
-  tag:
-    description: |
-      Name of the release tag.
-    required: true
   repository:
     description: |
       Repository where the release process took place.
     default: ${{ github.repository }}
-  github-token:
+  tag:
     description: |
-      Token to authenticate to GitHub API.  Defaults to `secrets.GITHUB_TOKEN`.
+      Name of the release tag.
+    required: true
+  token:
+    description: |
+      Token to authenticate to the GitHub API.
     default: ${{ github.token }}
 runs:
   using: composite
@@ -27,19 +27,15 @@ runs:
     - name: Retrieve PR
       id: pr
       run: |
-        {
-          echo number'<<'NUMBER
-          gh pr list \
-              -S "$tag"' is:merged label:"autorelease: tagged" sort:created-desc' \
-              -L 1 \
-              -q '.[0].number' \
-              --json number
-          echo NUMBER
-        } >> "$GITHUB_OUTPUT"
+        gh pr list \
+            -L 1 \
+            -S "$tag"' is:merged label:"autorelease: tagged" sort:created-desc' \
+            -t '{{range .}}number={{.number}}{{"\n"}}{{end}}' \
+            --json number >>"$GITHUB_OUTPUT"
       shell: bash
       env:
         GH_REPO: ${{ inputs.repository }}
-        GH_TOKEN: ${{ inputs.github-token }}
+        GH_TOKEN: ${{ inputs.token }}
         tag: ${{ inputs.tag }}
     - name: Mark PR as published
       if: ${{ steps.pr.outputs.number }}
@@ -50,5 +46,5 @@ runs:
       shell: bash
       env:
         GH_REPO: ${{ inputs.repository }}
-        GH_TOKEN: ${{ inputs.github-token }}
+        GH_TOKEN: ${{ inputs.token }}
         pr: ${{ steps.pr.outputs.number }}
