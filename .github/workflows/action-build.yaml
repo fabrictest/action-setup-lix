@@ -98,7 +98,7 @@ jobs:
         shell: bash
         working-directory: ${{ steps.files.outputs.download-path }}
   test-example:
-    name: Example
+    name: Test example
     needs:
       - build-matrix
     strategy:
