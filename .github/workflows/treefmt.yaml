@@ -63,30 +63,41 @@ jobs:
             style: format changes in pull request
           ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ steps.app-token.outputs.token }}
-      - name: Log changes as PR annotations
+      - name: Set up external Git diff
         if: ${{ failure() && !steps.commit.outputs.ref }}
         run: |
-          GIT_EXTERNAL_DIFF=$(mktemp)
-          cat <<"EOF" >"$GIT_EXTERNAL_DIFF"
-          #!/usr/bin/env bash
-          endl=$'\n'
-          diff --changed-group-format "::error title=$GITHUB_WORKFLOW,file=$1,line=%df%(n=0?:%(n=1?:,endLine=%dl))::Format violations found.  See: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT#summary-$GITHUB_JOB_ID.$endl" --line-format= "$2" "$5" || :
-          EOF
+          GIT_EXTERNAL_DIFF="$RUNNER_TEMP/git-external-diff-$RANDOM"
+          touch "$GIT_EXTERNAL_DIFF"
           chmod +x "$GIT_EXTERNAL_DIFF"
-          export GIT_EXTERNAL_DIFF
-          GITHUB_JOB_ID=$(
-            gh api repos/{owner}/{repo}/actions/runs/"$GITHUB_RUN_ID"/attempts/"$GITHUB_RUN_ATTEMPT"/jobs |
-              jq -r ".jobs[] | select(.runner_name==\"$RUNNER_NAME\") | .id"
-          )
-          export GITHUB_JOB_ID
-          git -P diff --diff-filter=M
+          echo GIT_EXTERNAL_DIFF="$GIT_EXTERNAL_DIFF" >>"$GITHUB_ENV"
+        shell: bash
+      - name: Fetch job ID
+        if: ${{ failure() && !steps.commit.outputs.ref }}
+        run: |
+          {
+            echo GH_JOB_ID'<<'GH_JOB_ID
+            gh api "repos/{owner}/{repo}/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs" \
+                -q ".jobs[] | select(.runner_name == \"$RUNNER_NAME\") | .id"
+            echo GH_JOB_ID
+          } >>"$GITHUB_ENV"
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+      - name: Log changes as PR annotations
+        if: ${{ failure() && !steps.commit.outputs.ref }}
+        run: |
+          ! git diff --quiet || exit 0
+          cat <<"EOF" >"$GIT_EXTERNAL_DIFF"
+          #!/usr/bin/env bash
+          endl=$'\n'
+          diff --changed-group-format "::error title=$GITHUB_WORKFLOW,file=$1,line=%df%(n=0?:%(n=1?:,endLine=%dl))::Format violations found. See: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT#summary-$GH_JOB_ID.$endl" --line-format= "$2" "$5" || :
+          EOF
+          git -P diff --diff-filter=M
+        shell: bash
       - name: Log changes as job summary
         if: ${{ failure() && !steps.commit.outputs.ref }}
         run: |
-          GIT_EXTERNAL_DIFF=$(mktemp)
+          ! git diff --quiet || exit 0
           cat <<"EOF" >"$GIT_EXTERNAL_DIFF"
           #!/usr/bin/env bash
           printf '* [`%s`](%s):\n\n' "$1" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$GITHUB_SHA/$1"
@@ -94,12 +105,12 @@ jobs:
           diff -u "$2" "$5" | tail -n +3 | sed -e 's/^/  /' || :
           printf '  ``````````````````````````````````````````````````````````````````\n\n'
           EOF
-          chmod +x "$GIT_EXTERNAL_DIFF"
-          export GIT_EXTERNAL_DIFF
           {
-            ! git diff --quiet || exit 0
-            printf '\n\nThe following files have format violations that require manual intervention:\n\n'
+            cat <<EOF
+
+            The following files have format violations that require manual intervention:
+
+            EOF
             git -P diff --diff-filter=M
-            printf '\n\n---\n\n'
           } >>"$GITHUB_STEP_SUMMARY"
         shell: bash
