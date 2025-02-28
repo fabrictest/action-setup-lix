@@ -34,7 +34,7 @@ jobs:
           persist-credentials: false
       - name: Format files
         run: |
-          nix develop -c treefmt --no-cache --fail-on-change
+          nix develop --no-write-lock-file -c treefmt --no-cache --fail-on-change
         shell: bash
       - name: List modified files
         if: ${{ failure() && github.event.sender.login != 'the-accuser[bot]' }}
