@@ -78,7 +78,7 @@ Build a specific version of Lix like this (requires you to use a version of Lix
 that supports flakes):
 
 ```$
-nix build github:fabrictest/action-setup-lix#lix-2_91_1 >/dev/null
+nix build --no-write-lock-file github:fabrictest/action-setup-lix#lix-2_91_1 >/dev/null
 ./result/bin/nix --quiet --version
 ```
 
@@ -89,7 +89,7 @@ nix (Lix, like Nix) 2.91.1
 You can also directly run Lix with `nix shell -c`:
 
 ```$
-nix shell github:fabrictest/action-setup-lix#lix-2_91_1 -c nix --quiet --version
+nix shell --no-write-lock-file github:fabrictest/action-setup-lix#lix-2_91_1 -c nix --quiet --version
 ```
 
 ```
@@ -101,7 +101,7 @@ List all available Lix versions with:
 <!-- x-release-please-start-version -->
 
 ```$
-nix flake show --all-systems github:fabrictest/action-setup-lix/v0.14.0
+nix flake show --no-write-lock-file --all-systems github:fabrictest/action-setup-lix/v0.14.0
 ```
 
 ```
@@ -151,7 +151,7 @@ specify a specific release of `action-setup-lix` like this:
 <!-- x-release-please-start-version -->
 
 ```console
-$ nix build github:fabrictest/action-setup-lix/v0.14.0#lix-2_91_1
+$ nix build --no-write-lock-file github:fabrictest/action-setup-lix/v0.14.0#lix-2_91_1
 ```
 
 Note that we've added `/v0.14.0` to the flake URL above.
