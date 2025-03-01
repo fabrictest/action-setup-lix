@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-test -z "${RUNNER_DEBUG:-}" || set -x
+test "${RUNNER_DEBUG:-}" != '1' || set -x
 
 function group {
-	printf "::group::%s\n" "$*"
+	printf '::group::%s\n' "$*"
 }
 
 function endgroup {
-	printf "::endgroup::\n"
+	printf '::endgroup::\n'
 }
 
 function die {
-	printf "::error::%s\n" "$*"
+	printf '::error::%s\n' "$*"
 	exit 1
 }
 
@@ -51,44 +51,43 @@ endgroup
 
 group 'Install Lix store'
 {
-	test -f "$LIX_STORE_FILE" ||
-		gh release download v"$(cat "$ACTION_PATH"/VERSION)" \
-			--output "$LIX_STORE_FILE" \
-			--pattern "${LIX_STORE_FILE##*/}" \
-			--repo "$ACTION_REPOSITORY"
-	gh attestation verify "$LIX_STORE_FILE" --{,signer-}repo="$ACTION_REPOSITORY"
+	test -f "$LIX_STORE_FILE" || {
+		mkdir -p "${LIX_STORE_FILE%/*}"
+		gh release download "v$(cat VERSION)" \
+			-O "$LIX_STORE_FILE" \
+			-R "$GH_ACTION_REPOSITORY" \
+			-p "${LIX_STORE_FILE##*/}"
+	}
+	gh attestation verify "$LIX_STORE_FILE" \
+		--{,signer-}repo="$GH_ACTION_REPOSITORY"
 	rm -rf /nix/var/gha
-	test "$RUNNER_OS" != macOS && tar=tar || tar=gtar
-	$tar --auto-compress --extract --skip-old-files --directory /nix --strip-components 1 <"$LIX_STORE_FILE"
-	rm -f "$LIX_STORE_FILE"
+	test "$RUNNER_OS" != 'macOS' && tar='tar' || tar='gtar'
+	$tar -ax --skip-old-files -C /nix --strip-components 1 <"$LIX_STORE_FILE"
 }
 endgroup
 
 group 'Synthesize nix.conf'
 {
-	mkdir -p "$XDG_CONFIG_HOME"/nix
-	pushd "$XDG_CONFIG_HOME"/nix
-	cat <<EOF >>nix.conf
+	install -d -o "$USER" "$XDG_CONFIG_HOME/nix"
+	cat <<EOF >>"$XDG_CONFIG_HOME/nix/nix.conf"
 accept-flake-config = true
 access-tokens = ${GITHUB_SERVER_URL#*://}=$GITHUB_TOKEN
 experimental-features = nix-command flakes
-include $PWD/${GITHUB_REPOSITORY//\//_}.conf
+include $RUNNER_TEMP/nix.conf
 EOF
-	cat <<<"$NIX_CONF" >"${GITHUB_REPOSITORY//\//_}".conf
-	popd
+	cat <<<"${NIX_CONF:-}" >"$RUNNER_TEMP/nix.conf"
 }
 endgroup
 
 group 'Install Lix'
 {
-	pushd "$(readlink /nix/var/gha/lix)"
+	lix_path=$(readlink /nix/var/gha/lix)
 	./bin/nix-store --load-db </nix/var/gha/registration
 	# shellcheck source=/dev/null
-	MANPATH='' . ./etc/profile.d/nix.sh
-	test -n "${NIX_SSL_CERT_FILE:-}" -o ! -e /etc/ssl/cert.pem ||
+	MANPATH='' source "$lix_path/etc/profile.d/nix.sh"
+	! test -z "${NIX_SSL_CERT_FILE:-}" -a -e /etc/ssl/cert.pem ||
 		NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
-	./bin/nix-env --install "$PWD"
-	popd
+	"$lix_path/bin/nix-env" --install "$lix_path"
 }
 endgroup
 

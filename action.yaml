@@ -6,53 +6,50 @@ inputs:
   lix-version:
     description: |
       The version of Lix that should be installed.
-
-      If not specified, the latest stable Lix release is used. Note that each
-      release of action-setup-lix has a specific set of supported
-      Lix versions, which do not change. You can check what Lix versions are
-      supported by the version of action-setup-lix you're using by
-      going to https://github.com/fabrictest/action-setup-lix/releases.
     # renovate: datasource=github-tags depName=lix-project/lix
     default: 2.91.1
-  lix-on-tmpfs:
-    description: |
-      Installs /nix on a tmpfs mount. This can make Lix operations faster, but
-      you risk running out of memory if your Lix store grows too big. Only
-      enable this if you're absolutely sure the size of your Lix store (and
-      database, logs etc) will be considerably less than the available memory.
-      This option does nothing on MacOS runners.
-    default: false
   nix-conf:
     description: |
-      If set, this configuration is written to $XDG_CONFIG_HOME/nix/nix.conf,
+      If set, this configuration is appended to `$XDG_CONFIG_HOME/nix/nix.conf`,
       which is read by Lix.
-      See https://docs.lix.systems/manual/lix/stable/command-ref/conf-file.html for
-      information on what settings that are available. Make sure the settings
-      you define are supported by the Lix version you're using.
-    default: ""
-  github-token:
+      See https://docs.lix.systems/manual/lix/stable/command-ref/conf-file.html
+      for information on what settings that are available.
+      Make sure your settings are supported by the Lix version you're using.
+    required: false
+  token:
     description: |
-      Configure Lix to use the specified token when fetching from GitHub.
-      Defaults to `secrets.GITHUB_TOKEN`.
+      Token to authenticate to the GitHub API.
+      Lix will use this token when fetching content from GitHub.
     default: ${{ github.token }}
-  lix-store-dir:
-    default: ${{ runner.temp }}
+  lix-on-tmpfs:
+    description: |
+      Installs /nix on a tmpfs mount.
+      This can make Lix operations faster,
+      but you risk running out of memory if your Lix store grows too big.
+      Only enable this if you're absolutely sure the size of your Lix store
+      (and database, logs, etc.)
+      will be considerably less than the available memory.
+
+      This option does nothing on macOS runners.
+    default: false
+  lix-store-base-dir:
+    default: ${{ runner.temp }}/${{ github.action_repository || github.repository }}
 runs:
   using: composite
   steps:
-    - shell: bash
-      working-directory: ${{ github.action_path }}
+    - name: Install Lix
       run: ./action.bash
+      shell: bash
+      working-directory: ${{ github.action_path }}
       env:
         # XXX(eff): https://github.com/orgs/community/discussions/49245
-        ACTION_PATH: ${{ github.action_path }}
-        ACTION_REPOSITORY: ${{ github.action_repository || github.repository }}
-        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GH_ACTION_REPOSITORY: ${{ github.action_repository || github.repository }}
+        GITHUB_TOKEN: ${{ inputs.token }}
         LIX_ON_TMPFS: ${{ inputs.lix-on-tmpfs == 'true' }}
         LIX_STORE_FILE: >-
           ${{
             format('{0}/lix-{1}-{2}-{3}.tar.zstd',
-              inputs.lix-store-dir,
+              inputs.lix-store-base-dir,
               inputs.lix-version,
               fromJSON('{"ARM64": "aarch64", "X64": "x86_64"}')[runner.arch],
               fromJSON('{"macOS": "darwin", "Linux": "linux"}')[runner.os]

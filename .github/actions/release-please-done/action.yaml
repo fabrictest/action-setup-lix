@@ -2,7 +2,7 @@
 name: release-please-done
 author: F. Emerson
 description: |
-  Marks a release pull request opened by Release Please as published.
+  Marks a pull request opened by Release Please as published.
   This event marks the end of the release process.
 
   Required permissions:

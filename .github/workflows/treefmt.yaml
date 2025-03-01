@@ -34,7 +34,7 @@ jobs:
           persist-credentials: false
       - name: Format files
         run: |
-          nix develop --no-write-lock-file -c treefmt --no-cache --fail-on-change
+          nix develop -c treefmt --no-cache --fail-on-change
         shell: bash
       - name: List modified files
         if: ${{ failure() && github.event.sender.login != 'the-accuser[bot]' }}
@@ -63,7 +63,7 @@ jobs:
             style: format changes in pull request
           ref: ${{ github.event.pull_request.head.ref }}
           token: ${{ steps.app-token.outputs.token }}
-      - name: Set up external Git diff
+      - name: Set up external Git diff script
         if: ${{ failure() && !steps.commit.outputs.ref }}
         run: |
           GIT_EXTERNAL_DIFF="$RUNNER_TEMP/git-external-diff-$RANDOM"
