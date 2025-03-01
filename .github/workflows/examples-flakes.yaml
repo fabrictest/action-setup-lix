@@ -1,4 +1,5 @@
 ---
+name: Examples / Flakes
 on: workflow_dispatch
 jobs:
   example:
@@ -9,5 +10,5 @@ jobs:
         with:
           repository: fabrictest/action-setup-lix
           persist-credentials: true
-      - run: nix build ./example
+      - run: nix build ./examples/flakes
       - run: ./result/bin/hello

@@ -39,10 +39,11 @@ TODO: Generate inputs table.
 The following workflow installs Lix and then just runs
 `nix-build --version`:
 
-<!-- [$ example-minimal.yaml](.github/workflows/example-minimal.yaml) as yaml -->
+<!-- [$ examples-minimal.yaml](.github/workflows/examples-minimal.yaml) as yaml -->
 
 ```yaml
 ---
+name: Examples / Minimal
 on: workflow_dispatch
 jobs:
   example:
@@ -63,10 +64,11 @@ experimental-features = nix-command flakes
 accept-flake-config = true
 ```
 
-<!-- [$ example-flake.yaml](.github/workflows/example-flake.yaml) as yaml -->
+<!-- [$ examples-flakes.yaml](.github/workflows/examples-flakes.yaml) as yaml -->
 
 ```yaml
 ---
+name: Examples / Flakes
 on: workflow_dispatch
 jobs:
   example:
@@ -77,7 +79,7 @@ jobs:
         with:
           repository: fabrictest/action-setup-lix
           persist-credentials: true
-      - run: nix build ./example
+      - run: nix build ./examples/flakes
       - run: ./result/bin/hello
 ```
 
