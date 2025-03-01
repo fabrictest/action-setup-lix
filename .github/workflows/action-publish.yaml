@@ -29,7 +29,7 @@ jobs:
           tag: ${{ github.event.release.tag_name }}
       - name: Download Lix stores
         id: lix-stores
-        uses: dawidd6/action-download-artifact@20319c5641d495c8a52e688b7dc5fada6c3a9fbc # v8
+        uses: dawidd6/action-download-artifact@07ab29fd4a977ae4d2b275087cf67563dfdf0295 # v9
         with:
           github_token: ${{ github.token }}
           workflow_search: true
