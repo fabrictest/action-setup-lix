@@ -1,6 +1,7 @@
 ---
 name: Examples / Flakes
 on: workflow_dispatch
+permissions: {}
 jobs:
   example:
     runs-on: ubuntu-latest

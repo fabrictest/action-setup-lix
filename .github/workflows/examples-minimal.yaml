@@ -1,6 +1,7 @@
 ---
 name: Examples / Minimal
 on: workflow_dispatch
+permissions: {}
 jobs:
   example:
     runs-on: ubuntu-latest
