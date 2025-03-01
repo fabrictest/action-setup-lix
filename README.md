@@ -53,7 +53,7 @@ jobs:
       - run: nix build --version
 ```
 
-![action-minimal](https://github.com/user-attachments/assets/89a6c8bf-5a07-4301-b2fc-43f1aa38fbd3)
+![examples-minimal](assets/img/examples-minimal.webp)
 
 ### Flakes
 
@@ -83,7 +83,7 @@ jobs:
       - run: ./result/bin/hello
 ```
 
-![action-flake](https://github.com/user-attachments/assets/f2fded39-3f20-4e32-9444-21e571fe615c)
+![examples-flakes](assets/img/examples-flakes.webp)
 
 You can see the flake definition for the above example in
 [examples/flakes/flake.nix](examples/flakes/flake.nix).
