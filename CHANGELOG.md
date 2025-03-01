@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.15.0](https://github.com/fabrictest/action-setup-lix/compare/v0.14.0...v0.15.0) (2025-03-01)
+
+
+### Features
+
+* Simplify script ([e24c5a7](https://github.com/fabrictest/action-setup-lix/commit/e24c5a753ff277715e0a484f5ca3b134b051cdd1))
+
+
+### Bug Fixes
+
+* Lix_path ([473d68c](https://github.com/fabrictest/action-setup-lix/commit/473d68c85130f29b159421b1d49cd280e3b0b543))
+
 ## [0.14.0](https://github.com/fabrictest/action-setup-lix/compare/v0.13.0...v0.14.0) (2025-02-15)
 
 ### Features
