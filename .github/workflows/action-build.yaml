@@ -132,7 +132,7 @@ jobs:
           name: ${{ vars.CACHIX_NAME }}
       - name: Build flake
         run: |
-          nix build ./example
+          nix build ./examples/flakes
         shell: bash
       - name: Print `hello, world` message
         run: |
