@@ -78,7 +78,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: fabrictest/action-setup-lix
-          persist-credentials: true
+          persist-credentials: false
       - run: nix build ./examples/flakes
       - run: ./result/bin/hello
 ```
