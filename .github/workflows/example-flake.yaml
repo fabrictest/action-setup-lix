@@ -1,0 +1,13 @@
+---
+on: workflow_dispatch
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: fabrictest/action-setup-lix@v0.14.0
+      - uses: actions/checkout@v4
+        with:
+          repository: fabrictest/action-setup-lix
+          persist-credentials: true
+      - run: nix build ./example
+      - run: ./result/bin/hello

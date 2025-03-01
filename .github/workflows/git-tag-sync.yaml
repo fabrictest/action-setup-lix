@@ -19,8 +19,8 @@ jobs:
           {
             echo json'<<'JSON
             jq -Rcn '[inputs | select(length > 0)]' <<EOF
-          ${GITHUB_REF_NAME%.*}
           ${GITHUB_REF_NAME%%.*}
+          ${GITHUB_REF_NAME%.*}
           EOF
             echo JSON
           } >>"$GITHUB_OUTPUT"

@@ -39,17 +39,17 @@ TODO: Generate inputs table.
 The following workflow installs Lix and then just runs
 `nix-build --version`:
 
+<!-- [$ example-minimal.yaml](.github/workflows/example-minimal.yaml) as yaml -->
+
 ```yaml
-name: Examples
-on: push
+---
+on: workflow_dispatch
 jobs:
-  minimal:
+  example:
     runs-on: ubuntu-latest
     steps:
-      - uses: fabrictest/action-setup-lix@v1
+      - uses: fabrictest/action-setup-lix@v0.14.0
       - run: nix build --version
-      - run: nix build ./examples/flakes
-      - run: ./result/bin/hello
 ```
 
 ![action-minimal](https://github.com/user-attachments/assets/89a6c8bf-5a07-4301-b2fc-43f1aa38fbd3)
@@ -61,6 +61,24 @@ These settings are always set by default:
 ```conf
 experimental-features = nix-command flakes
 accept-flake-config = true
+```
+
+<!-- [$ example-flake.yaml](.github/workflows/example-flake.yaml) as yaml -->
+
+```yaml
+---
+on: workflow_dispatch
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: fabrictest/action-setup-lix@v0.14.0
+      - uses: actions/checkout@v4
+        with:
+          repository: fabrictest/action-setup-lix
+          persist-credentials: true
+      - run: nix build ./example
+      - run: ./result/bin/hello
 ```
 
 ![action-flake](https://github.com/user-attachments/assets/f2fded39-3f20-4e32-9444-21e571fe615c)
@@ -77,10 +95,12 @@ quickly need to compare the behavior between different Lix versions.
 Build a specific version of Lix like this (requires you to use a version of Lix
 that supports flakes):
 
-```$
+```
 nix build --no-write-lock-file github:fabrictest/action-setup-lix#lix-2_91_1 >/dev/null
 ./result/bin/nix --quiet --version
 ```
+
+<!-- `$ nix build --no-write-lock-file .#lix-2_91_1 >/dev/null && ./result/bin/nix --quiet --version` -->
 
 ```
 nix (Lix, like Nix) 2.91.1
@@ -88,24 +108,25 @@ nix (Lix, like Nix) 2.91.1
 
 You can also directly run Lix with `nix shell -c`:
 
-```$
-nix shell --no-write-lock-file github:fabrictest/action-setup-lix#lix-2_91_1 -c nix --quiet --version
 ```
-
-```
-nix (Lix, like Nix) 2.91.1
+nix shell --no-write-lock-file github:fabrictest/action-setup-lix#lix-2_91_1 -c \
+    nix --quiet --version
 ```
 
 List all available Lix versions with:
 
 <!-- x-release-please-start-version -->
 
-```$
-nix flake show --no-write-lock-file --all-systems github:fabrictest/action-setup-lix/v0.14.0
+```
+nix flake show --all-systems github:fabrictest/action-setup-lix/v0.14.0
 ```
 
+<!-- x-release-please-end -->
+
+<!-- `$ nix flake show --all-systems --no-write-lock-file github:fabrictest/action-setup-lix | sed -e '1 s|[^/]*$|…|'` -->
+
 ```
-github:fabrictest/action-setup-lix/f8931851e8f8db4d7745a048a157cdcca7b5e636
+github:fabrictest/action-setup-lix/…
 ├───__functor: unknown
 ├───__std: unknown
 ├───aarch64-darwin: unknown
@@ -142,16 +163,14 @@ github:fabrictest/action-setup-lix/f8931851e8f8db4d7745a048a157cdcca7b5e636
 └───x86_64-linux: unknown
 ```
 
-<!-- x-release-please-end -->
-
 If you want to make sure that the version of Lix you're trying to build hasn't
 been removed in the latest revision of `action-setup-lix`, you can
 specify a specific release of `action-setup-lix` like this:
 
 <!-- x-release-please-start-version -->
 
-```console
-$ nix build --no-write-lock-file github:fabrictest/action-setup-lix/v0.14.0#lix-2_91_1
+```
+nix build github:fabrictest/action-setup-lix/v0.14.0#lix-2_91_1
 ```
 
 Note that we've added `/v0.14.0` to the flake URL above.
