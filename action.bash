@@ -82,7 +82,7 @@ endgroup
 group 'Install Lix'
 {
 	lix_path=$(readlink /nix/var/gha/lix)
-	./bin/nix-store --load-db </nix/var/gha/registration
+	"$lix_path/bin/nix-store" --load-db </nix/var/gha/registration
 	# shellcheck source=/dev/null
 	MANPATH='' source "$lix_path/etc/profile.d/nix.sh"
 	! test -z "${NIX_SSL_CERT_FILE:-}" -a -e /etc/ssl/cert.pem ||
