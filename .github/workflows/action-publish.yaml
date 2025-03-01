@@ -29,7 +29,7 @@ jobs:
           tag: ${{ github.event.release.tag_name }}
       - name: Download Lix stores
         id: lix-stores
-        uses: dawidd6/action-download-artifact@20319c5641d495c8a52e688b7dc5fada6c3a9fbc # v8
+        uses: dawidd6/action-download-artifact@07ab29fd4a977ae4d2b275087cf67563dfdf0295 # v9
         with:
           github_token: ${{ github.token }}
           workflow_search: true
@@ -38,10 +38,11 @@ jobs:
           name_is_regexp: true
           commit: ${{ steps.release.outputs.sha }}
           search_artifacts: true
+          merge_multiple: true
       - name: Verify integrity of Lix stores
         if: ${{ steps.lix-stores.outputs.found_artifact }}
         run: |
-          for f in lix-stores-*/lix-*.tar.*; do
+          for f in lix-*.tar.*; do
             gh attestation verify "$f" --{,signer-}repo="$GITHUB_REPOSITORY"
           done
         shell: bash
@@ -51,7 +52,7 @@ jobs:
       - name: Attach Lix stores to GitHub release
         if: ${{ steps.lix-stores.outputs.found_artifact }}
         run: |
-          gh release upload "$tag" lix-stores-*/lix-*.tar.*
+          gh release upload "$tag" lix-*.tar.*
         shell: bash
         working-directory: ${{ runner.temp }}
         env:
