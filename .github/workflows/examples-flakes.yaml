@@ -6,8 +6,8 @@ jobs:
   example:
     runs-on: ubuntu-latest
     steps:
-      - uses: fabrictest/action-setup-lix@v0.14.0
-      - uses: actions/checkout@v4
+      - uses: fabrictest/action-setup-lix@f8931851e8f8db4d7745a048a157cdcca7b5e636 # v0.14.0
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           repository: fabrictest/action-setup-lix
           persist-credentials: false

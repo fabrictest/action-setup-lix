@@ -6,5 +6,5 @@ jobs:
   example:
     runs-on: ubuntu-latest
     steps:
-      - uses: fabrictest/action-setup-lix@v0.14.0
+      - uses: fabrictest/action-setup-lix@f8931851e8f8db4d7745a048a157cdcca7b5e636 # v0.14.0
       - run: nix build --version
