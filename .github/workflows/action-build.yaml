@@ -119,7 +119,7 @@ jobs:
         uses: ./
         with:
           lix-on-tmpfs: true
-          lix-store-dir: ${{ steps.lix-stores.outputs.download-path }}
+          lix-store-base-dir: ${{ steps.lix-stores.outputs.download-path }}
           lix-version: ${{ matrix.build.version }}
       - name: Verify that Lix was installed
         run: |
