@@ -50,7 +50,7 @@ jobs:
   example:
     runs-on: ubuntu-latest
     steps:
-      - uses: fabrictest/action-setup-lix@f8931851e8f8db4d7745a048a157cdcca7b5e636 # v0.14.0
+      - uses: fabrictest/action-setup-lix@d5d7d9aa579140ff7b9b64c02766ed55bb80c3f8 # v0.15.0
       - run: nix build --version
 ```
 
@@ -76,7 +76,7 @@ jobs:
   example:
     runs-on: ubuntu-latest
     steps:
-      - uses: fabrictest/action-setup-lix@f8931851e8f8db4d7745a048a157cdcca7b5e636 # v0.14.0
+      - uses: fabrictest/action-setup-lix@d5d7d9aa579140ff7b9b64c02766ed55bb80c3f8 # v0.15.0
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           repository: fabrictest/action-setup-lix
