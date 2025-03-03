@@ -2,22 +2,20 @@
 let
   inherit (inputs) self l std;
   inherit (inputs.cells) lix;
+  inherit (cell.lib) prj;
 in
 std.lib.dev.mkNixago std.lib.cfg.githubsettings {
   data = {
 
     repository =
       let
-        name = l.pipe (self + /.config/prj_id) [
-          l.readFile
-          l.trim
-        ];
+        name = prj.id;
       in
       {
         inherit name;
-        description = "Install Lix faster than you can refresh a GitHub Actions workflow page";
+        description = "Install Lix on GitHub Actions";
         homepage = "https://github.com/fabrictest/${name}";
-        topics = "github-actions,lix,nix,wip";
+        topics = "github-actions,lix,nix";
         private = false;
         visibility = "public";
         has_issues = true;
@@ -94,8 +92,8 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
                     "test-example"
                   ];
                   lix-version = l.pipe lix.packages [
-                    (l.filterAttrs (name: _: name != "lix-stores"))
-                    (l.mapAttrsToList (_: drv: drv.version))
+                    (l.filterAttrs (name: _drv: name != "lix-stores"))
+                    (l.mapAttrsToList (_name: drv: drv.version))
                   ];
                   inherit (workflow.jobs.build-lix-stores.strategy.matrix) runs-on;
                   context = l.pipe { inherit job lix-version runs-on; } [

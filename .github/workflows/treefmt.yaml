@@ -74,6 +74,7 @@ jobs:
       - name: Fetch job ID
         if: ${{ failure() && !steps.commit.outputs.ref }}
         run: |
+          ! git diff --quiet || exit 0
           {
             echo GH_JOB_ID'<<'GH_JOB_ID
             gh api "repos/{owner}/{repo}/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs" \
@@ -90,7 +91,7 @@ jobs:
           cat <<"EOF" >"$GIT_EXTERNAL_DIFF"
           #!/usr/bin/env bash
           endl=$'\n'
-          diff --changed-group-format "::error title=$GITHUB_WORKFLOW,file=$1,line=%df%(n=0?:%(n=1?:,endLine=%dl))::Format violations found. See: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT#summary-$GH_JOB_ID.$endl" --line-format= "$2" "$5" || :
+          diff --changed-group-format "::error title=$GITHUB_WORKFLOW,file=$1,line=%df%(n=0?:%(n=1?:,endLine=%dl))::Format violations found.  See: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT#summary-$GH_JOB_ID.$endl" --line-format= "$2" "$5" || :
           EOF
           git -P diff --diff-filter=M
         shell: bash

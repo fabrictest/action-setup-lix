@@ -3,9 +3,9 @@ let
   inherit (cell) pkgs;
 
   lixVersions = l.pipe pkgs.lixVersions [
-    (l.filterAttrs (_: l.isDerivation))
+    (l.filterAttrs (_name: l.isDerivation))
     (l.mapAttrs' (
-      _: drv: l.nameValuePair "${drv.pname}-${l.replaceStrings [ "." ] [ "_" ] drv.version}" drv
+      _name: drv: l.nameValuePair "${drv.pname}-${l.replaceStrings [ "." ] [ "_" ] drv.version}" drv
     ))
   ];
 
@@ -26,7 +26,7 @@ let
         mkdir -p root/nix/var/{nix,gha} "$out"
         ln -s "$lix" root/nix/var/gha/lix
         cp {"$closureInfo",root/nix/var/gha}/registration
-        tar --auto-compress --create --directory=root --file="$out/$fileName" --files-from="$closureInfo"/store-paths nix
+        tar -ac -C root -T "$closureInfo/store-paths" -f "$out/$fileName" nix
       '';
 in
 lixVersions
@@ -34,7 +34,7 @@ lixVersions
   lix-stores =
     (pkgs.buildEnv {
       name = "lix-stores";
-      paths = l.mapAttrsToList (_: mkLixStore) lixVersions;
+      paths = l.mapAttrsToList (_name: mkLixStore) lixVersions;
     }).overrideAttrs
       {
         preferLocalBuild = false;

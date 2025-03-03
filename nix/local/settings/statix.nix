@@ -4,6 +4,7 @@ let
   inherit (cell) pkgs;
 in
 std.lib.dev.mkNixago {
+
   output = "statix.toml";
 
   packages = [ pkgs.statix ];

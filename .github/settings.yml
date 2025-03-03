@@ -9,7 +9,7 @@ repository:
   allow_update_branch: true
   default_branch: main
   delete_branch_on_merge: true
-  description: Install Lix faster than you can refresh a GitHub Actions workflow page
+  description: Install Lix on GitHub Actions
   enable_automated_security_fixes: false
   enable_vulnerability_alerts: true
   has_issues: true
@@ -23,7 +23,7 @@ repository:
   private: false
   squash_merge_commit_message: PR_BODY
   squash_merge_commit_title: PR_TITLE
-  topics: github-actions,lix,nix,wip
+  topics: github-actions,lix,nix
   use_squash_pr_title_as_default: true
   visibility: public
 rulesets:

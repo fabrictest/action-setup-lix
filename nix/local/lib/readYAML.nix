@@ -4,9 +4,14 @@ let
 
   yaml2json =
     path:
-    pkgs.runCommand "yaml2json" { nativeBuildInputs = [ pkgs.remarshal ]; } ''
-      yaml2json <"${path}" >"''$out"
-    '';
+    pkgs.runCommand "yaml2json"
+      {
+        nativeBuildInputs = [ pkgs.remarshal ];
+        inherit path;
+      }
+      ''
+        yaml2json <"''$path" >"''$out"
+      '';
 
 in
 

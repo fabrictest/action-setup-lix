@@ -1,9 +1,11 @@
 let
   inherit (inputs) l std;
+  inherit (cell.lib) prj;
 in
 {
   default = std.lib.dev.mkShell {
-    name = "action-setup-lix";
+
+    name = prj.id;
 
     imports = [
       std.std.devshellProfiles.default

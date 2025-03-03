@@ -13,7 +13,7 @@ std.lib.dev.mkNixago std.lib.cfg.treefmt {
       ];
     };
 
-    # NOTE(eff): We assign priorities according to the rule:
+    # NOTE(eff): We assign priorities according to the rule of thumb:
     # "format, then lint".
 
     # *
@@ -89,6 +89,7 @@ std.lib.dev.mkNixago std.lib.cfg.treefmt {
       mdformat = {
         command = l.getExe pkgs.python3Packages.mdformat;
         includes = [ "*.md" ];
+        priority = 0;
       };
     };
 

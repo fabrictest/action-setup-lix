@@ -4,6 +4,7 @@ let
   inherit (cell) pkgs;
 in
 std.lib.dev.mkNixago {
+
   output = "yamlfmt.yaml";
 
   packages = [ pkgs.yamlfmt ];

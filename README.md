@@ -99,12 +99,24 @@ quickly need to compare the behavior between different Lix versions.
 Build a specific version of Lix like this (requires you to use a version of Lix
 that supports flakes):
 
+<!-- renovate: datasource=github-tags depName=lix-project/lix -->
+
+<!-- `! lix_version=2.91.1` -->
+
+<!-- `! lix_version="${lix_version//./_}"` -->
+
+<!--
+```$
+echo "nix build github:fabrictest/action-setup-lix#lix-$lix_version >/dev/null"
+echo "./result/bin/nix --quiet --version"
+``` -->
+
 ```
-nix build --no-write-lock-file github:fabrictest/action-setup-lix#lix-2_91_1 >/dev/null
+nix build github:fabrictest/action-setup-lix#lix-2_91_1 >/dev/null
 ./result/bin/nix --quiet --version
 ```
 
-<!-- `$ nix build --no-write-lock-file .#lix-2_91_1 >/dev/null && ./result/bin/nix --quiet --version` -->
+<!-- `$ nix build --no-write-lock-file .#lix-"$lix_version" >/dev/null && ./result/bin/nix --quiet --version` -->
 
 ```
 nix (Lix, like Nix) 2.91.1
@@ -112,9 +124,10 @@ nix (Lix, like Nix) 2.91.1
 
 You can also directly run Lix with `nix shell -c`:
 
+<!-- `$ echo "nix shell --no-write-lock-file github:fabrictest/action-setup-lix#lix-$lix_version -c nix --quiet --version"` -->
+
 ```
-nix shell --no-write-lock-file github:fabrictest/action-setup-lix#lix-2_91_1 -c \
-    nix --quiet --version
+nix shell --no-write-lock-file github:fabrictest/action-setup-lix#lix-2_91_1 -c nix --quiet --version
 ```
 
 List all available Lix versions with:
@@ -172,6 +185,8 @@ been removed in the latest revision of `action-setup-lix`, you can
 specify a specific release of `action-setup-lix` like this:
 
 <!-- x-release-please-start-version -->
+
+<!-- `$ echo "nix build github:fabrictest/action-setup-lix/v0.15.0#lix-$lix_version"` -->
 
 ```
 nix build github:fabrictest/action-setup-lix/v0.15.0#lix-2_91_1
