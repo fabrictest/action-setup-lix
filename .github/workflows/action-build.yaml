@@ -47,7 +47,7 @@ jobs:
           persist-credentials: false
       - name: Build Lix stores
         run: |
-          nix build .#lix-stores
+          nix build .
         shell: bash
       - name: Attest Lix stores
         uses: actions/attest-build-provenance@bd77c077858b8d561b7a36cbe48ef4cc642ca39d # v2.2.2
