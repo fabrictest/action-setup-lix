@@ -88,11 +88,12 @@ std.lib.dev.mkNixago std.lib.cfg.githubsettings {
               required_status_checks =
                 let
                   workflow = cell.lib.readYAML (self + /.github/workflows/action-build.yaml);
-                  job = l.map (job: workflow.jobs.${job}.name) [
-                    "test-example"
+                  job = l.pipe workflow.jobs [
+                    (l.filterAttrs (id: _spec: l.hasPrefix "test-" id))
+                    (l.mapAttrsToList (_id: spec: spec.name))
                   ];
                   lix-version = l.pipe lix.packages [
-                    (l.filterAttrs (name: _drv: name != "lix-stores"))
+                    (l.filterAttrs (name: _drv: l.match "^lix-([0-9_]+)$" name != null))
                     (l.mapAttrsToList (_name: drv: drv.version))
                   ];
                   inherit (workflow.jobs.build-lix-stores.strategy.matrix) runs-on;

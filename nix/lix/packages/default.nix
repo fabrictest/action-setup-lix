@@ -23,14 +23,15 @@ let
         inherit lix;
       }
       ''
-        mkdir -p root/nix/var/{nix,gha} "$out"
+        mkdir -p "$out" root/nix/var/{nix,gha}
         ln -s "$lix" root/nix/var/gha/lix
         cp {"$closureInfo",root/nix/var/gha}/registration
         tar -ac -C root -T "$closureInfo/store-paths" -f "$out/$fileName" nix
       '';
 in
 lixVersions
-// {
+// rec {
+  default = lix-stores;
   lix-stores =
     (pkgs.buildEnv {
       name = "lix-stores";
