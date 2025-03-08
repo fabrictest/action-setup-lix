@@ -135,7 +135,7 @@ List all available Lix versions with:
 <!-- x-release-please-start-version -->
 
 ```
-nix flake show --all-systems github:fabrictest/action-setup-lix/v0.15.0
+nix flake show --all-systems github:fabrictest/action-setup-lix/v0.16.0
 ```
 
 <!-- x-release-please-end -->
@@ -161,18 +161,22 @@ github:fabrictest/action-setup-lix/…
 │   └───lixPackages: Nixpkgs overlay
 ├───packages
 │   ├───aarch64-darwin
+│   │   ├───default: package 'lix-stores'
 │   │   ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
 │   │   ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
 │   │   └───lix-stores: package 'lix-stores'
 │   ├───aarch64-linux
+│   │   ├───default: package 'lix-stores'
 │   │   ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
 │   │   ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
 │   │   └───lix-stores: package 'lix-stores'
 │   ├───x86_64-darwin
+│   │   ├───default: package 'lix-stores'
 │   │   ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
 │   │   ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
 │   │   └───lix-stores: package 'lix-stores'
 │   └───x86_64-linux
+│       ├───default: package 'lix-stores'
 │       ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
 │       ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
 │       └───lix-stores: package 'lix-stores'
@@ -186,13 +190,13 @@ specify a specific release of `action-setup-lix` like this:
 
 <!-- x-release-please-start-version -->
 
-<!-- `$ echo "nix build github:fabrictest/action-setup-lix/v0.15.0#lix-$lix_version"` -->
+<!-- `$ echo "nix build github:fabrictest/action-setup-lix/v0.16.0#lix-$lix_version"` -->
 
 ```
-nix build github:fabrictest/action-setup-lix/v0.15.0#lix-2_91_1
+nix build github:fabrictest/action-setup-lix/v0.16.0#lix-2_91_1
 ```
 
-Note that we've added `/v0.15.0` to the flake URL above.
+Note that we've added `/v0.16.0` to the flake URL above.
 
 <!-- x-release-please-end -->
 
