@@ -161,18 +161,22 @@ github:fabrictest/action-setup-lix/…
 │   └───lixPackages: Nixpkgs overlay
 ├───packages
 │   ├───aarch64-darwin
+│   │   ├───default: package 'lix-stores'
 │   │   ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
 │   │   ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
 │   │   └───lix-stores: package 'lix-stores'
 │   ├───aarch64-linux
+│   │   ├───default: package 'lix-stores'
 │   │   ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
 │   │   ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
 │   │   └───lix-stores: package 'lix-stores'
 │   ├───x86_64-darwin
+│   │   ├───default: package 'lix-stores'
 │   │   ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
 │   │   ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
 │   │   └───lix-stores: package 'lix-stores'
 │   └───x86_64-linux
+│       ├───default: package 'lix-stores'
 │       ├───lix-2_90_0: package 'lix-2.90.0' - 'Powerful package manager that makes package management reliable and reproducible'
 │       ├───lix-2_91_1: package 'lix-2.91.1' - 'Powerful package manager that makes package management reliable and reproducible'
 │       └───lix-stores: package 'lix-stores'
