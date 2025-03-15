@@ -56,7 +56,7 @@ jobs:
       - name: Commit changes
         id: commit
         if: ${{ failure() && steps.changes.outputs.files }}
-        uses: IAreKyleW00t/verified-bot-commit@23b4a1caa2c6beccca0ebb28814009a804d9d3b3 # v1.0.12
+        uses: IAreKyleW00t/verified-bot-commit@b736aa5032e8208bb405e273908a1b90f72c0d48 # v1.0.14
         with:
           files: ${{ steps.changes.outputs.files }}
           message: |
