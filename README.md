@@ -135,7 +135,7 @@ List all available Lix versions with:
 <!-- x-release-please-start-version -->
 
 ```
-nix flake show --all-systems github:fabrictest/action-setup-lix/v0.15.0
+nix flake show --all-systems github:fabrictest/action-setup-lix/v0.16.0
 ```
 
 <!-- x-release-please-end -->
@@ -190,13 +190,13 @@ specify a specific release of `action-setup-lix` like this:
 
 <!-- x-release-please-start-version -->
 
-<!-- `$ echo "nix build github:fabrictest/action-setup-lix/v0.15.0#lix-$lix_version"` -->
+<!-- `$ echo "nix build github:fabrictest/action-setup-lix/v0.16.0#lix-$lix_version"` -->
 
 ```
-nix build github:fabrictest/action-setup-lix/v0.15.0#lix-2_91_1
+nix build github:fabrictest/action-setup-lix/v0.16.0#lix-2_91_1
 ```
 
-Note that we've added `/v0.15.0` to the flake URL above.
+Note that we've added `/v0.16.0` to the flake URL above.
 
 <!-- x-release-please-end -->
 
